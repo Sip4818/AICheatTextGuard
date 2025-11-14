@@ -1,0 +1,26 @@
+# Virtual environments
+myvenv/
+venv/
+.venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Data (never push datasets)
+data/raw/
+data/processed/
+
+# ML artifacts (never push models)
+artifacts/
+
+# MLflow experiment logs (optional)
+mlruns/
+
+# OS / editor specific
+.DS_Store
+.vscode/
+.idea/
+
+# Logs
+logs/
