@@ -1,6 +1,21 @@
 import os
 
-# List of folders to create in the current repo
+def create_folder(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+        print(f"[+] Created folder: {path}")
+    else:
+        print(f"[=] Folder already exists: {path}")
+
+def create_file(path):
+    if not os.path.exists(path):
+        with open(path, "w") as f:
+            pass
+        print(f"[+] Created file: {path}")
+    else:
+        print(f"[=] File already exists: {path}")
+
+# List of folders to create
 folders = [
     "config",
     "data/raw",
@@ -18,11 +33,11 @@ folders = [
     "tests",
 ]
 
-# Create folders
+# Create folders safely
 for folder in folders:
-    os.makedirs(folder, exist_ok=True)
+    create_folder(folder)
 
-# Add __init__.py in every Python module folder
+# Python module folders -> ensure __init__.py exists
 src_subfolders = [
     "src",
     "src/components",
@@ -32,50 +47,49 @@ src_subfolders = [
 ]
 
 for sf in src_subfolders:
-    with open(f"{sf}/__init__.py", "w") as f:
-        pass
+    create_file(f"{sf}/__init__.py")
 
-# List of files to create
-files = {
-    "README.md": "",
-    "requirements.txt": "",
-    "setup.py": "",
-    "main.py": "",
-    "app.py": "",
-    ".gitignore": "",
+# Files to create safely
+files = [
+    "README.md",
+    "requirements.txt",
+    "setup.py",
+    "main.py",
+    "app.py",
+    ".gitignore",
 
     # Config
-    "config/config.yaml": "",
-    "config/configuration.py": "",
+    "config/config.yaml",
+    "config/configuration.py",
 
     # Logs
-    "logs/AICheatTextGuard.log": "",
+    "logs/AICheatTextGuard.log",
 
     # Components
-    "src/components/data_ingestion.py": "",
-    "src/components/data_transformation.py": "",
-    "src/components/model_trainer.py": "",
-    "src/components/model_evaluation.py": "",
+    "src/components/data_ingestion.py",
+    "src/components/data_transformation.py",
+    "src/components/model_trainer.py",
+    "src/components/model_evaluation.py",
 
-    # Entities
-    "src/entity/config_entity.py": "",
-    "src/entity/artifact_entity.py": "",
+    # Entity
+    "src/entity/config_entity.py",
+    "src/entity/artifact_entity.py",
 
-    # Pipelines
-    "src/pipeline/training_pipeline.py": "",
-    "src/pipeline/prediction_pipeline.py": "",
+    # Pipeline
+    "src/pipeline/training_pipeline.py",
+    "src/pipeline/prediction_pipeline.py",
 
     # Utils
-    "src/utils/common.py": "",
-    "src/utils/logger.py": "",
+    "src/utils/common.py",
+    "src/utils/logger.py",
+    "src/utils/exception.py",
 
     # Tests
-    "tests/test_basic.py": "",
-}
+    "tests/test_basic.py",
+]
 
-# Create files
-for file_path, content in files.items():
-    with open(file_path, "w") as f:
-        f.write(content)
+# Create files safely
+for file_path in files:
+    create_file(file_path)
 
-print("Project structure created successfully in this repo!")
+print("\n🎉 SAFE Project structure check complete!")
