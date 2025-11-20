@@ -1,6 +1,6 @@
 import sys
 import traceback
-from logger import logging
+from src.utils.logger import logging
 class AITextException(Exception):
     def __init__(self, message: str):
         super().__init__(message)
@@ -25,10 +25,10 @@ class AITextException(Exception):
     
 
 
-if __name__=="__main__":
-    try:
-        logging.info("entered the function")
-        a=1/0
-    except Exception as e:
-        raise AITextException(e)
+# if __name__=="__main__":
+#     try:
+#         logging.info("entered the function")
+#         a=1/0
+#     except Exception as e:
+#         raise AITextException(e)
 

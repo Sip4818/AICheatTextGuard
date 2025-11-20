@@ -1,0 +1,12 @@
+
+
+data_ingestion:
+    cloud_train_data_path: "data/raw/train.csv"
+    cloud_test_data_path: "data/raw/test.csv"
+    bucket_name: "ai_text_guard_data"
+    local_data_dir: data/raw
+    local_train_path: data/raw/train.csv
+    local_test_path: data/raw/test.csv
+  
+  
+

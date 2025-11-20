@@ -24,3 +24,6 @@ mlruns/
 
 # Logs
 logs/
+
+credentials/
+.env
