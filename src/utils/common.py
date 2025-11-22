@@ -1,3 +1,4 @@
+from src.utils.logger import logging
 import yaml
 from google.cloud import storage
 import os
@@ -5,6 +6,8 @@ from box import ConfigBox
 
 
 def read_yaml(path: str) -> ConfigBox:
+    logging.info(f"Reading YAML file: {path}")
+    logging.info(f"Reading YAML file: {path}")
     with open(path, "r") as f:
         content = yaml.safe_load(f)
     return ConfigBox(content)

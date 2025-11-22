@@ -1,3 +1,4 @@
+from src.utils.logger import logging
 from src.components.data_ingestion import DataIngestion
 from src.entity.artifact_entity import DataIngestionArtifact
 from config.configuration import ConfigurationManager
@@ -9,7 +10,8 @@ class TrainingPipeline:
         pass
 
     def start_data_ingestion(self) -> DataIngestionArtifact:
-
+        logging.info("Data Ingestion stage started.")
+        
         # Step 1 - Create pipeline root config
         pipeline_config = TrainingPipelineConfig()
 
@@ -27,7 +29,7 @@ class TrainingPipeline:
 
         # Step 5 - Run ingestion
         ingestion_artifact = data_ingestion.initiate_data_ingestion()
-
+        logging.info("Data Ingestion stage completed.")
         return ingestion_artifact
 
 
