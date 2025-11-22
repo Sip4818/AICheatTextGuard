@@ -1,3 +1,4 @@
+from src.utils.logger import logging
 from src.entity.config_entity import DataIngestionConfig
 from src.entity.artifact_entity import DataIngestionArtifact
 from src.utils.common import download_from_gcs
@@ -7,6 +8,7 @@ class DataIngestion:
         self.cfg = cfg
 
     def download_data(self):
+        logging.info(f"Downloading train and file from GCS: {self.cfg.cloud_train_path}")
         try:
             download_from_gcs(
                 bucket_name=self.cfg.bucket_name,
@@ -20,7 +22,8 @@ class DataIngestion:
             )
         except Exception as e:
             raise AITextException(e)
-            
+        logging.info(f"Downloaded train → {self.cfg.local_train_path}")
+        logging.info(f"Downloaded test → {self.cfg.local_test_path}")
 
     def initiate_data_ingestion(self)->DataIngestionArtifact:
         self.download_data()
