@@ -1,35 +1,45 @@
-from src.utils.logger import logging
+from src.utils.logger import logger
 from src.components.data_ingestion import DataIngestion
-from src.entity.artifact_entity import DataIngestionArtifact
+from src.components.data_validation import DataValidation
+from src.entity.artifact_entity import DataIngestionArtifact,DataValidationArtifact
 from config.configuration import ConfigurationManager
 from config.training_pipeline_config import TrainingPipelineConfig
-from src.constants.constants import config_yaml_file_path
+from src.constants.constants import config_yaml_file_path,schema_yaml_file_path
 
 class TrainingPipeline:
     def __init__(self):
-        pass
-
-    def start_data_ingestion(self) -> DataIngestionArtifact:
-        logging.info("Data Ingestion stage started.")
-        
-        # Step 1 - Create pipeline root config
         pipeline_config = TrainingPipelineConfig()
 
-        # Step 2 - Create config manager with YAML + pipeline config
-        config_manager = ConfigurationManager(
+        self.config_manager = ConfigurationManager(
             training_pipeline_config=pipeline_config,
-            yaml_file_path=config_yaml_file_path
+            yaml_file_path=config_yaml_file_path,
+            schema_file_path=schema_yaml_file_path
         )
 
+    def start_data_ingestion(self) -> DataIngestionArtifact:
+        logger.info("Data Ingestion stage started.")
+
         # Step 3 - Fetch DataIngestionConfig object
-        data_ingestion_config = config_manager.get_data_ingestion_config()
+        data_ingestion_config = self.config_manager.get_data_ingestion_config()
 
         # Step 4 - Create DataIngestion component
         data_ingestion = DataIngestion(cfg=data_ingestion_config)
 
         # Step 5 - Run ingestion
         ingestion_artifact = data_ingestion.initiate_data_ingestion()
-        logging.info("Data Ingestion stage completed.")
+        logger.info(f"Data Ingestion stage completed: {ingestion_artifact}.")
         return ingestion_artifact
 
 
+    def start_data_validation(self)->DataValidationArtifact:
+
+        logger.info("Data validation stage started")
+
+        data_validation_config=self.config_manager.get_data_validation_config()
+
+        data_validation=DataValidation(cfg=data_validation_config)
+
+        validation_artifact=data_validation.initiate_data_validation()
+        logger.info(f"Data validation stage completed: {validation_artifact}")
+
+        return validation_artifact

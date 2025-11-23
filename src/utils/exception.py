@@ -1,6 +1,6 @@
 import sys
 import traceback
-from src.utils.logger import logging
+from src.utils.logger import logger
 class AITextException(Exception):
     def __init__(self, message: str):
         super().__init__(message)
@@ -18,7 +18,7 @@ class AITextException(Exception):
             caller = traceback.extract_stack()[-2]
             self.file = caller.filename
             self.line = caller.lineno
-        logging.error(f"{self.message} | File: {self.file} | Line: {self.line}",exc_info=True)   
+        # logger.error(f"{self.message} | File: {self.file} | Line: {self.line}",exc_info=True)   
 
     def __str__(self):
         return f"{self.message} (File: {self.file}, Line: {self.line})"

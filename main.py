@@ -2,10 +2,15 @@ from src.pipeline.training_pipeline import TrainingPipeline
 from dotenv import load_dotenv
 load_dotenv()
 from src.utils.logger import logging
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning, module="google_crc32c")
 
 
 if __name__ == "__main__":
-    logging.info("🚀 Starting Training Pipeline...")
+    logging.info(" Starting Training Pipeline...")
     pipeline = TrainingPipeline()
     pipeline.start_data_ingestion()
-    logging.info("✅ Training Pipeline Completed.")
+    pipeline.start_data_validation()
+    logging.info("Training Pipeline Completed.")
+
+
