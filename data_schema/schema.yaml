@@ -1,0 +1,18 @@
+required_columns:
+  - id
+  - topic
+  - answer
+  - is_cheating
+
+  
+columns_dtype:
+  id: object
+  topic: object
+  answer: object
+  is_cheating: int64
+
+
+
+
+allowed_values:
+  is_cheating: [0,1]

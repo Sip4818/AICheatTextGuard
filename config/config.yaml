@@ -1,4 +1,4 @@
-
+artifact_root: artifact
 
 data_ingestion:
     cloud_train_data_path: "data/raw/train.csv"
@@ -8,5 +8,10 @@ data_ingestion:
     local_train_path: data/raw/train.csv
     local_test_path: data/raw/test.csv
   
-  
+data_validation:
+    data_validation_dir_name: data_validation
+    validate_train_data_path: data/raw/train.csv
+    validate_test_data_path: data/raw/test.csv
+    validated_data_report_file_name: data_validation_report.txt
+    
 
