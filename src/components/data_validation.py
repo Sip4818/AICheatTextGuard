@@ -2,6 +2,8 @@ from src.entity.config_entity import DataValidationConfig
 from src.entity.artifact_entity import DataValidationArtifact
 from src.utils.common import read_csv_file
 import pandas as pd
+from src.utils.logger import logger
+from src.utils.exception import AITextException
 
 class DataValidation:
     def __init__(self,cfg: DataValidationConfig)-> DataValidationArtifact:
@@ -73,6 +75,9 @@ class DataValidation:
             "mismatched_dtypes": mismatches
         }
 
+    def _write_report(self, path: str):
+        with open(path, "w") as f:
+            f.write(str(self.report))
 
     def initiate_data_validation(self):
         df_train=read_csv_file(self.cfg.raw_train_data_path)
@@ -82,9 +87,18 @@ class DataValidation:
         self.validate_missing_values(df_train)
         self.validate_allowed_values(df_train)
         self.validate_dtype(df_train)
-        with open(self.cfg.data_validation_report_path, "w") as f:
-            f.write(str(self.report))
+        # Save inside artifact folder (timestamped)
+        self._write_report(self.cfg.data_validation_report_artifact_path)
+
+        # Save inside permanent report folder (optional)
+        self._write_report(self.cfg.data_validation_report_path)
+        
+        for check,val in self.report.items():
+            if val['status']==False:
+                logger.error(f"{check} status shows negative")
+                raise AITextException(f"{check} status shows negative")
 
         return DataValidationArtifact(
-            data_validation_report_path = self.cfg.data_validation_report_path
+            data_validation_report_artifact_path= self.cfg.data_validation_report_artifact_path,
+            data_validation_report_path=self.cfg.data_validation_report_path
         )

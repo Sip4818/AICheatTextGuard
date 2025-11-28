@@ -13,5 +13,15 @@ data_validation:
     validate_train_data_path: data/raw/train.csv
     validate_test_data_path: data/raw/test.csv
     validated_data_report_file_name: data_validation_report.txt
+    data_validation_report_directory: reports/
     
+data_transformation:
+    transformed_data_dir: data/transformed/
+    transformed_train_file_name: train.npy
+    transformed_test_file_name: test.npy
+    transformed_val_file_name: val.npy
+    artifact_objects_dir: data_transformation/
+    model_dir: models
+    data_transformation_object_name: "text_features_preprocessor.pkl"
+    test_split_ratio: 0.2
 

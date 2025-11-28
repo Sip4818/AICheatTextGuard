@@ -12,7 +12,7 @@ columns_dtype:
   is_cheating: int64
 
 
-
-
 allowed_values:
   is_cheating: [0,1]
+
+target_column_name: is_cheating
