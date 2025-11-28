@@ -1,7 +1,8 @@
+from src.components.data_transformation import DataTransformation
 from src.utils.logger import logger
 from src.components.data_ingestion import DataIngestion
 from src.components.data_validation import DataValidation
-from src.entity.artifact_entity import DataIngestionArtifact,DataValidationArtifact
+from src.entity.artifact_entity import DataIngestionArtifact, DataTransformationArtifact,DataValidationArtifact
 from config.configuration import ConfigurationManager
 from config.training_pipeline_config import TrainingPipelineConfig
 from src.constants.constants import config_yaml_file_path,schema_yaml_file_path
@@ -43,3 +44,18 @@ class TrainingPipeline:
         logger.info(f"Data validation stage completed: {validation_artifact}")
 
         return validation_artifact
+
+    def start_data_transformation(self)->DataTransformationArtifact:
+        
+        logger.info("Data Transformation stage started")
+
+        data_transformation_config=self.config_manager.get_data_transformation_config()
+
+        data_transformation=DataTransformation(data_transformation_config)
+
+        data_transformation_artifact=data_transformation.initiate_data_transformation()
+
+        logger.info(f"Data Transformation stage completed")
+
+        return data_transformation_artifact
+
