@@ -8,8 +8,8 @@ __pycache__/
 *.pyc
 
 # Data (never push datasets)
-data/raw/
-data/processed/
+data/
+
 
 # ML artifacts (never push models)
 artifacts/
