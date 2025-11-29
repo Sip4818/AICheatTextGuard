@@ -28,5 +28,5 @@ credentials/
 .env
 
 models/
-/data
+
 /reports
