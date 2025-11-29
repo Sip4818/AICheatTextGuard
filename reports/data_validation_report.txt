@@ -1,1 +1,0 @@
-{'schema_check': {'status': True, 'missing_columns': []}, 'missing_values_check': {'status': True, 'details': {'id': 0, 'topic': 0, 'answer': 0, 'is_cheating': 0}}, 'allowed_values_check': {'status': True, 'invalid_rows': {}}, 'dtype_check': {'status': True, 'mismatched_dtypes': {}}}
