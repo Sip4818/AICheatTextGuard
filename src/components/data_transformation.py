@@ -36,7 +36,7 @@ class DataTransformation:
         X=pipeline.fit_transform(X)
         np.save(self.cfg.transformed_train_data_path,np.hstack((X,y)))
         np.save(self.cfg.transformed_test_data_path,X_test)
-
+        
         joblib.dump(pipeline, self.cfg.data_transformation_object_path)
         return DataTransformationArtifact(
             data_transformation_object_path=self.cfg.data_transformation_object_path,

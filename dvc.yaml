@@ -1,0 +1,28 @@
+stages:
+  ingest_data:
+    cmd: python -m src.pipeline.ingest_data
+    deps:
+      - src/pipeline/ingest_data.py
+      - src/components/data_ingestion.py
+      - config/config.yaml
+    outs:
+      - data/raw
+
+  validate_data:
+    cmd: python -m src.pipeline.validate_data
+    deps:
+      - src/pipeline/validate_data.py
+      - src/components/data_validation.py
+      - data/raw
+    outs:
+      - reports/data_validation_report.txt
+
+  transform_data:
+    cmd: python -m src.pipeline.transform_data
+    deps:
+      - src/pipeline/transform_data.py
+      - src/components/data_transformation.py
+      - data/raw
+      - reports/data_validation_report.txt
+    outs:
+      - data/transformed
