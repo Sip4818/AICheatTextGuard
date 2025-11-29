@@ -21,3 +21,51 @@ stages:
       md5: a21cb287ed202b67d8818403aec3d7f8.dir
       size: 628180
       nfiles: 2
+  validate_data:
+    cmd: python -m src.pipeline.validate_data
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: a21cb287ed202b67d8818403aec3d7f8.dir
+      size: 628180
+      nfiles: 2
+    - path: src/components/data_validation.py
+      hash: md5
+      md5: 56f514de105ee45ba89fdd79414731bd
+      size: 3362
+    - path: src/pipeline/validate_data.py
+      hash: md5
+      md5: ba283a7402b634d24ae2abf4e018d3a9
+      size: 164
+    outs:
+    - path: reports
+      hash: md5
+      md5: c518539d2dcd43a5db3ceeef8b972882.dir
+      size: 284
+      nfiles: 1
+  transform_data:
+    cmd: python -m src.pipeline.transform_data
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: a21cb287ed202b67d8818403aec3d7f8.dir
+      size: 628180
+      nfiles: 2
+    - path: reports/data_validation_report.txt
+      hash: md5
+      md5: 7e91b823413cec731f73c074cbf15d65
+      size: 284
+    - path: src/components/data_transformation.py
+      hash: md5
+      md5: 52b08b4504e8eeb1c2732da1eea43d64
+      size: 1875
+    - path: src/pipeline/transform_data.py
+      hash: md5
+      md5: bda82cff197c2ec81605ef6335c03b9d
+      size: 168
+    outs:
+    - path: data/transformed
+      hash: md5
+      md5: 6f654eb58b3e757892c6fc8ea3df9651.dir
+      size: 2837023
+      nfiles: 2
