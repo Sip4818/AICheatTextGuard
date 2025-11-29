@@ -1,5 +1,0 @@
-[core]
-    remote = storage
-    autostage = true
-['remote "storage"']
-    url = gs://ai_text_guard_bucket/dvcstore

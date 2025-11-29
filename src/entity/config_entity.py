@@ -13,6 +13,8 @@ class DataIngestionConfig:
 
 @dataclass
 class DataValidationConfig:
+    raw_train_data_path: str
+    raw_test_data_path: str
     data_validation_report_artifact_path: str
     data_validation_report_path: str
     required_columns: List
