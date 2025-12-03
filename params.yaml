@@ -1,0 +1,27 @@
+model_trainer:
+  preprocess:
+    test_size: 0.2
+    random_state: 42
+    scale: true
+
+  train:
+    folds: 5
+
+  level1:
+    lr:
+      C: 1.0
+      penalty: "l2"
+      max_iter: 1000
+
+    xgb:
+      n_estimators: 300
+      max_depth: 6
+      learning_rate: 0.05
+      subsample: 0.8
+      colsample_bytree: 0.8
+
+  level2:
+    lr:
+      C: 0.5
+      penalty: "l2"
+      max_iter: 1000

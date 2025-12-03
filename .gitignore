@@ -27,6 +27,5 @@ logs/
 credentials/
 .env
 
-models/
+temp/
 
-/reports

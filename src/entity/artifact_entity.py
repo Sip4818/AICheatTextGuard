@@ -7,7 +7,6 @@ class DataIngestionArtifact:
 
 @dataclass
 class DataValidationArtifact:
-    data_validation_report_artifact_path: str
     data_validation_report_path: str
 
 @dataclass

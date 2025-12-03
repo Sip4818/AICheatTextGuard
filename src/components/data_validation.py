@@ -37,12 +37,6 @@ class DataValidation:
             "status": status,
             "details": missing_info
         }
-
-        
-        
-
-                
-
         
     def validate_allowed_values(self, df):
         invalid_rows = {}
@@ -87,10 +81,7 @@ class DataValidation:
         self.validate_missing_values(df_train)
         self.validate_allowed_values(df_train)
         self.validate_dtype(df_train)
-        # Save inside artifact folder (timestamped)
-        self._write_report(self.cfg.data_validation_report_artifact_path)
 
-        # Save inside permanent report folder (optional)
         self._write_report(self.cfg.data_validation_report_path)
         
         for check,val in self.report.items():
@@ -99,6 +90,5 @@ class DataValidation:
                 raise AITextException(f"{check} status shows negative")
 
         return DataValidationArtifact(
-            data_validation_report_artifact_path= self.cfg.data_validation_report_artifact_path,
             data_validation_report_path=self.cfg.data_validation_report_path
         )

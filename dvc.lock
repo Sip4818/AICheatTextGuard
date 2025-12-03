@@ -5,8 +5,8 @@ stages:
     deps:
     - path: config/config.yaml
       hash: md5
-      md5: 20e6c42a0e44742d0696c26a93995e7c
-      size: 943
+      md5: 456dc305e0888b84c69bcb28e318f544
+      size: 2319
     - path: src/components/data_ingestion.py
       hash: md5
       md5: 9c6fa0016a6ee20daaa0bccb79654b32
@@ -31,14 +31,14 @@ stages:
       nfiles: 2
     - path: src/components/data_validation.py
       hash: md5
-      md5: 56f514de105ee45ba89fdd79414731bd
-      size: 3362
+      md5: 655395ed084f446182b5b431dc63034c
+      size: 3034
     - path: src/pipeline/validate_data.py
       hash: md5
       md5: ba283a7402b634d24ae2abf4e018d3a9
       size: 164
     outs:
-    - path: reports
+    - path: artifact/data_validation
       hash: md5
       md5: c518539d2dcd43a5db3ceeef8b972882.dir
       size: 284
@@ -51,19 +51,20 @@ stages:
       md5: a21cb287ed202b67d8818403aec3d7f8.dir
       size: 628180
       nfiles: 2
-    - path: reports/data_validation_report.txt
-      hash: md5
-      md5: 7e91b823413cec731f73c074cbf15d65
-      size: 284
     - path: src/components/data_transformation.py
       hash: md5
-      md5: 52b08b4504e8eeb1c2732da1eea43d64
-      size: 1875
+      md5: ba16c199aabe042d1645d43ce7c2e02a
+      size: 1880
     - path: src/pipeline/transform_data.py
       hash: md5
       md5: bda82cff197c2ec81605ef6335c03b9d
       size: 168
     outs:
+    - path: artifact/data_transformation
+      hash: md5
+      md5: 4e0446ce2b896ecb856fb47236033b4c.dir
+      size: 91396352
+      nfiles: 1
     - path: data/transformed
       hash: md5
       md5: 6f654eb58b3e757892c6fc8ea3df9651.dir

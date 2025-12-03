@@ -15,7 +15,7 @@ stages:
       - src/components/data_validation.py
       - data/raw
     outs:
-      - reports
+      - artifact/data_validation
 
   transform_data:
     cmd: python -m src.pipeline.transform_data
@@ -23,6 +23,6 @@ stages:
       - src/pipeline/transform_data.py
       - src/components/data_transformation.py
       - data/raw
-      - reports/data_validation_report.txt
     outs:
       - data/transformed
+      - artifact/data_transformation

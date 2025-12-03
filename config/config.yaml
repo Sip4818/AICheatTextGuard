@@ -1,6 +1,8 @@
 artifact_root: artifact
+data_root: data
 
 data_ingestion:
+    root_dir: data/raw
     cloud_train_data_path: "data/raw/train.csv"
     cloud_test_data_path: "data/raw/test.csv"
     bucket_name: "ai_text_guard_bucket"
@@ -9,19 +11,51 @@ data_ingestion:
     local_test_path: data/raw/test.csv
   
 data_validation:
-    data_validation_dir_name: data_validation
-    validate_train_data_path: data/raw/train.csv
-    validate_test_data_path: data/raw/test.csv
-    validated_data_report_file_name: data_validation_report.txt
-    data_validation_report_directory: reports/
+    root_dir: artifact/data_validation
+    validated_data_report_file_path: artifact/data_validation/data_validation_report.txt
     
 data_transformation:
-    transformed_data_dir: data/transformed/
-    transformed_train_file_name: train.npy
-    transformed_test_file_name: test.npy
-    transformed_val_file_name: val.npy
-    artifact_objects_dir: data_transformation/
-    model_dir: models
-    data_transformation_object_name: "text_features_preprocessor.pkl"
-    test_split_ratio: 0.2
+    artifact_root_dir: artifact/data_transformation
+    data_root_dir: data/transformed
+    transformed_train_data_path: data/transformed/train.npy
+    transformed_test_data_path: data/transformed/test.npy
+    transformed_val_data_path: data/transformed/val.npy
+    temp_model_dir: temp
+    data_transformation_object_path: artifact/data_transformation/text_features_preprocessor.pkl
 
+model_trainer:
+    root_dir: artifact/model_trainer
+    lr_level_1_path: artifact/model_trainer/lr_level1.pkl
+    xgb_level_1_path: artifact/model_trainer/xgb_level1.pkl
+    meta_lr_path: artifact/model_trainer/meta_lr.pkl
+
+    final_model_path: artifact/model_trainer/stacked_model.pkl
+
+    lr_level1_oof_predictions_path: artifact/model_trainer/level1_oof/lr_oof.npy
+    xgb_level1_oof_predictions_path: artifact/model_trainer/level1_oof/xgb_oof.npy
+
+    tuning:
+        level1:
+            lr:
+                C: [0.001, 0.01, 0.1, 1.0, 3.0, 10.0]
+                penalty: ["l1", "l2"]
+                solver: ["liblinear", "lbfgs", "saga"]
+                max_iter: [300, 500, 1000]
+
+            xgb:
+                n_estimators: [100, 200, 300, 500, 700]
+                max_depth: [3, 4, 5, 6, 7, 8]
+                learning_rate: [0.005, 0.01, 0.03, 0.05, 0.1]
+                subsample: [0.6, 0.7, 0.8, 1.0]
+                colsample_bytree: [0.5, 0.7, 0.8, 1.0]
+                min_child_weight: [1, 3, 5, 7]
+                gamma: [0, 0.1, 0.3, 0.5]
+                reg_alpha: [0, 0.01, 0.1, 1.0]
+                reg_lambda: [0.1, 1.0, 2.0, 5.0]
+
+        level2:
+            lr:
+                C: [0.001, 0.01, 0.1, 0.5, 1.0, 3.0, 10.0]
+                penalty: ["l2"]     
+                solver: ["lbfgs", "liblinear"]
+                max_iter: [300, 500, 1000]

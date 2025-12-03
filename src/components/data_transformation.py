@@ -30,7 +30,7 @@ class DataTransformation:
 
         pipeline = Pipeline([
             ('basic_features_generator', BasicFeatureGenerator()),
-            ('embedding_features_generator', EmbeddingFeaturesGenerator(model_path=self.cfg.model_dir)),
+            ('embedding_features_generator', EmbeddingFeaturesGenerator(model_path=self.cfg.temp_model_dir)),
             ('identity', FunctionTransformer(self.identity_func))
         ])
         X=pipeline.fit_transform(X)
