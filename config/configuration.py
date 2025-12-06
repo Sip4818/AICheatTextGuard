@@ -131,3 +131,49 @@ class ConfigurationManager:
             xgb_level1_oof_predictions_path=self.model_trainer_config.xgb_level1_oof_predictions_path
 
         )
+
+    def get_model_trainer_tuning_config(self)-> ModelTrainerTuningConfig:
+        lr_space = LRSpace(
+                **self.model_trainer_config.tuning.level1.lr
+        )
+        xgb_space = XGBSpace(
+                **self.model_trainer_config.tuning.level1.xgb
+        )
+
+        Level1TuningConfig(
+            lr=lr_space,
+            xgb=xgb_space
+        )
+        Level2TuningConfig(
+            lr=lr_space
+        )
+
+        return ModelTrainerTuningConfig(
+            level1= Level1TuningConfig,
+            level2=Level2TuningConfig
+        )
+    
+    def get_model_trainer_final_params_config(self)->ModelTrainerConfig:
+
+        lr_final_params=LRFinalParams(
+            **self.params.model_trainer.level1.lr
+        )
+
+        xgb_final_params=XGBFinalParams(
+            **self.params.model_trainer.level1.xgb
+        )
+        
+        level1_final_params=Level1FinalParams(
+            lr=lr_final_params,
+            xgb=xgb_final_params
+        )
+
+        level2_final_params=Level2FinalParams(
+            **self.params.model_trainer.level2.lr
+        )
+
+        return ModelTrainerFinalParamsConfig(
+            level1=level1_final_params,
+            level2=level2_final_params
+        )
+            
