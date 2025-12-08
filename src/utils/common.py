@@ -6,7 +6,7 @@ from google.cloud import storage
 import os
 from box import ConfigBox
 import pandas as pd
-
+import joblib
 
 def read_yaml(path: str) -> ConfigBox:
     logger.info(f"Reading YAML file: {path}")
@@ -24,7 +24,6 @@ def download_from_gcs(bucket_name: str, source_path: str, local_path: str):
     """Downloads a blob from GCS to local."""
     try:
         logger.info(f"Downloading a file from {bucket_name} bucket")
-        # Ensure local folder exists
         os.makedirs(os.path.dirname(local_path), exist_ok=True)
 
         client = storage.Client()
@@ -46,4 +45,14 @@ def read_csv_file(file_path: str) -> pd.DataFrame:
         return df
     except Exception as e:
         logger.error(f"Failed to read CSV: {file_path}")
+        raise AITextException(e)
+    
+
+def save_model(model: object, model_path: str):
+    """Save the model"""
+    try:
+        joblib.dump(model,model_path)
+        logger.info(f'model saved at {model_path}')
+    except Exception as e:
+        logger.error(f"failed to save the model at {model_path}")
         raise AITextException(e)

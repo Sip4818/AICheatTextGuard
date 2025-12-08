@@ -13,3 +13,7 @@ class DataValidationArtifact:
 class DataTransformationArtifact:
     data_transformation_object_path: str
     transformed_data_dir: str
+
+@dataclass
+class ModelTrainerArtifact:
+    pass

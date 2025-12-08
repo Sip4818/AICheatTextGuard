@@ -34,6 +34,7 @@ model_trainer:
     lr_level1_oof_predictions_path: artifact/model_trainer/level1_oof/lr_oof.npy
     xgb_level1_oof_predictions_path: artifact/model_trainer/level1_oof/xgb_oof.npy
 
+    folds: 5
     tuning:
         level1:
             lr:

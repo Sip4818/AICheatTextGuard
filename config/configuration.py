@@ -123,8 +123,8 @@ class ConfigurationManager:
         return ModelTrainerConfig(
             transformed_train_data_path= self.transfomed_train_data_path,
             transformed_test_data_path=self.transfomed_test_data_path,
-            lr_level_1_path= self.model_trainer_config.lr_level_1_path,
-            xgb_level_1_path=self.model_trainer_config.xgb_level_1_path,
+            lr_level_1_model_path= self.model_trainer_config.lr_level_1_path,
+            xgb_level_1_model_path=self.model_trainer_config.xgb_level_1_path,
             meta_lr_path=self.model_trainer_config.meta_lr_path,
             final_mode_path=self.model_trainer_config.final_mode_path,
             lr_level1_oof_predictions_path=self.model_trainer_config.lr_level1_oof_predictions_path,
@@ -173,6 +173,7 @@ class ConfigurationManager:
         )
 
         return ModelTrainerFinalParamsConfig(
+            folds= self.params.model_trainer.train.folds,
             level1=level1_final_params,
             level2=level2_final_params
         )

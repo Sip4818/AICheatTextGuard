@@ -37,5 +37,6 @@ class Level2FinalParams:
 
 @dataclass
 class ModelTrainerFinalParamsConfig:
+    folds: int
     level1: Level1FinalParams
     level2: Level2FinalParams
