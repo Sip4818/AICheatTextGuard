@@ -29,6 +29,7 @@ class DataTransformationConfig:
     data_transformation_object_path: str
     temp_model_dir: str
     target_column_name: str
+    test_split_size: int
 
 @dataclass
 class ModelTrainerConfig:

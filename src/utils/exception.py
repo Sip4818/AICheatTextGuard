@@ -1,29 +1,29 @@
 import sys
 import traceback
-from src.utils.logger import logger
-class AITextException(Exception):
-    def __init__(self, message: str):
-        super().__init__(message)
-        self.message = message
 
-        # Get traceback of current exception
-        _, _, exc_tb = sys.exc_info()
+class AITextException(Exception):
+    def __init__(self, message):
+        # Convert to string to avoid issues with non-string errors
+        self.message = str(message)
+
+        # Get current exception traceback
+        exc_type, exc_value, exc_tb = sys.exc_info()
 
         if exc_tb:
-            last = traceback.extract_tb(exc_tb)[-1]
-            self.file = last.filename
-            self.line = last.lineno
+            # exception occurred inside try/except
+            tb = traceback.extract_tb(exc_tb)[-1]
+            self.file = tb.filename
+            self.line = tb.lineno
         else:
-            # If raised manually
-            caller = traceback.extract_stack()[-2]
+            # exception raised manually
+            caller = traceback.extract_stack(limit=2)[0]
             self.file = caller.filename
             self.line = caller.lineno
-        # logger.error(f"{self.message} | File: {self.file} | Line: {self.line}",exc_info=True)   
+
+        super().__init__(self.message)
 
     def __str__(self):
         return f"{self.message} (File: {self.file}, Line: {self.line})"
-    
-
 
 # if __name__=="__main__":
 #     try:

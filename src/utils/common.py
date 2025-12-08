@@ -1,58 +1,140 @@
+import os
+from pickle import NONE
+import yaml
+import joblib
+import pandas as pd
+from box import ConfigBox
+from google.cloud import storage
+import numpy as np
+
 from src.utils.logger import logger
 from src.utils.exception import AITextException
-import yaml
 
-from google.cloud import storage
-import os
-from box import ConfigBox
-import pandas as pd
-import joblib
 
+# ---------------------- READ YAML --------------------------- #
 def read_yaml(path: str) -> ConfigBox:
+    """Read yaml file"""
     logger.info(f"Reading YAML file: {path}")
-    logger.info(f"Reading YAML file: {path}")
+
     try:
+        if not os.path.exists(path):
+            raise AITextException(f"YAML file does not exist: {path}")
+
         with open(path, "r") as f:
             content = yaml.safe_load(f)
+
+        if content is None:
+            raise AITextException(f"YAML file is empty: {path}")
+
+        if not isinstance(content, dict):
+            raise AITextException(f"Invalid YAML structure in {path}: Must be a dictionary")
+
+        logger.info(f"YAML loaded successfully: {path}")
         return ConfigBox(content)
+
+    except yaml.YAMLError as e:
+        logger.error(f"YAML syntax error in: {path}")
+        raise AITextException(e)
+
     except Exception as e:
-        logger.error("Could not read {path} file")
+        logger.error(f"Could not read YAML file: {path}")
         raise AITextException(e)
 
 
-def download_from_gcs(bucket_name: str, source_path: str, local_path: str):
+# ---------------------- CREATE DIRECTORY --------------------------- #
+def create_dir(path: str, name: str) -> None:
+    """ Create directory"""
+    try:
+        os.makedirs(path, exist_ok=True)
+        logger.info(f"{name} directory created at: {path}")
+    except Exception as e:
+        logger.error(f"Failed to create directory {name}: {path}")
+        raise AITextException(e)
+
+
+def download_from_gcs(bucket_name: str, source_path: str, local_path: str) -> None:
     """Downloads a blob from GCS to local."""
     try:
-        logger.info(f"Downloading a file from {bucket_name} bucket")
+        logger.info(f"Downloading from GCS bucket={bucket_name}, blob={source_path}")
+
         os.makedirs(os.path.dirname(local_path), exist_ok=True)
 
         client = storage.Client()
         bucket = client.bucket(bucket_name)
+
+        if not bucket.exists(client):
+            raise AITextException(f"GCS bucket does not exist: {bucket_name}")
+
         blob = bucket.blob(source_path)
 
+        if not blob.exists(client):
+            raise AITextException(f"File does not exist in bucket: {source_path}")
+
         blob.download_to_filename(local_path)
-        logger.info(f"Downloading successfull, file saved at {local_path}")
+
+        logger.info(f"Download successful → saved at: {local_path}")
+
     except Exception as e:
-        logger.error(f"Failed to Download data at: {local_path}")
+        logger.error(f"Failed to download from GCS → {bucket_name}/{source_path}")
         raise AITextException(e)
 
+
 def read_csv_file(file_path: str) -> pd.DataFrame:
-    """Read a CSV file with proper logging & error handling."""
+    """Read csv file"""
     try:
         logger.info(f"Reading CSV file: {file_path}")
+
+        if not file_path.endswith(".csv"):
+            raise AITextException(f"Not a CSV file: {file_path}")
+
         df = pd.read_csv(file_path)
-        logger.info(f"CSV file read successfully: {file_path}, shape={df.shape}")
+
+        logger.info(f"CSV loaded successfully: {file_path}, shape={df.shape}")
+
         return df
+
     except Exception as e:
         logger.error(f"Failed to read CSV: {file_path}")
         raise AITextException(e)
-    
 
-def save_model(model: object, model_path: str):
-    """Save the model"""
+
+def save_model(model: object, model_path: str) -> None:
+    """ save model"""
     try:
-        joblib.dump(model,model_path)
-        logger.info(f'model saved at {model_path}')
+        dir_path=os.path.dirname(model_path)
+        if dir_path:
+            os.makedirs(dir_path, exist_ok=True)
+        joblib.dump(model, model_path)
+        logger.info(f"Model saved at {model_path}")
+
     except Exception as e:
-        logger.error(f"failed to save the model at {model_path}")
+        logger.error(f"Failed to save model at {model_path}")
         raise AITextException(e)
+
+
+def log_file_size(path: str, label: str = "File") -> None:
+    """Loggin file size"""
+    try:
+        size_kb = os.path.getsize(path) / 1024
+        logger.info(f"{label} size: {size_kb:.2f} KB")
+    except Exception as e:
+        logger.error(f"Failed to get file size for {path}")
+        raise AITextException(e)
+
+def assert_file_exists(path: str, label: str = "File") -> None:
+    if not os.path.exists(path):
+        raise AITextException(f"{label} does not exist at path: {path}")
+
+def save_numpy(array: np.ndarray, path: str ) -> None:
+    try:
+        dir_path=os.path.dirname(path)
+        if dir_path:
+            os.makedirs(dir_path, exist_ok=True)
+        np.save(path, array)
+
+        logger.info(f"numpy array saved at {path}")
+    except Exception as e:
+        logger.error(f"Failed to save numpy array at {path}")
+        raise AITextException(e)
+
+    
