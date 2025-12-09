@@ -11,7 +11,10 @@ from src.utils.logger import logger
 from src.utils.exception import AITextException
 
 
-# ---------------------- READ YAML --------------------------- #
+def assert_file_exists(path: str, label: str = "File") -> None:
+    if not os.path.exists(path):
+        raise AITextException(f"{label} does not exist at path: {path}")
+
 def read_yaml(path: str) -> ConfigBox:
     """Read yaml file"""
     logger.info(f"Reading YAML file: {path}")
@@ -41,7 +44,6 @@ def read_yaml(path: str) -> ConfigBox:
         raise AITextException(e)
 
 
-# ---------------------- CREATE DIRECTORY --------------------------- #
 def create_dir(path: str, name: str) -> None:
     """ Create directory"""
     try:
@@ -121,9 +123,18 @@ def log_file_size(path: str, label: str = "File") -> None:
         logger.error(f"Failed to get file size for {path}")
         raise AITextException(e)
 
-def assert_file_exists(path: str, label: str = "File") -> None:
-    if not os.path.exists(path):
-        raise AITextException(f"{label} does not exist at path: {path}")
+
+
+
+def read_numpy(path: str) -> np.ndarray:
+    try:
+        if not path.endswith(".npy"):
+            raise AITextException(f"Not a npy file: {path}")
+        return np.load(path)
+    except Exception as e:
+        logger.error(f"Could not read numpy array at {path}")
+        raise AITextException(e)
+
 
 def save_numpy(array: np.ndarray, path: str ) -> None:
     try:
