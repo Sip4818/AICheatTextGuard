@@ -1,4 +1,4 @@
-from src.pipeline.training_pipeline import TrainingPipeline
+from src.pipeline.training.training_pipeline import TrainingPipeline
 from dotenv import load_dotenv
 load_dotenv()
 if __name__ == "__main__":

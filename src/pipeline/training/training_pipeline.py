@@ -1,8 +1,14 @@
-from src.components.data_transformation import DataTransformation
 from src.utils.logger import logger
 from src.components.data_ingestion import DataIngestion
 from src.components.data_validation import DataValidation
-from src.entity.artifact_entity import DataIngestionArtifact, DataTransformationArtifact,DataValidationArtifact
+from src.components.data_transformation import DataTransformation
+from src.components.model_trainer import ModelTrainer
+from src.entity.artifact_entity import (
+     DataIngestionArtifact,
+       DataTransformationArtifact,
+       DataValidationArtifact,
+         ModelTrainerArtifact
+)
 from config.configuration import ConfigurationManager
 from config.training_pipeline_config import TrainingPipelineConfig
 from src.constants.constants import config_yaml_file_path,schema_yaml_file_path
@@ -58,4 +64,20 @@ class TrainingPipeline:
         logger.info(f"Data Transformation stage completed")
 
         return data_transformation_artifact
+    
+
+    def start_model_trainer(self)->ModelTrainerArtifact:
+
+        logger.info("Model trainer stage started")
+
+        model_trainer_config= self.config_manager.get_model_trainer_config()
+        model_tuning_config=self.config_manager.get_model_trainer_tuning_config()
+        model_trainer_final_params_config=self.config_manager.get_model_trainer_final_params_config()
+
+        model_trainer= ModelTrainer(model_trainer_config,model_tuning_config,model_trainer_final_params_config)
+
+        model_trainer_artifact=model_trainer.initiate_model_training()
+        logger.info("Model trainer stage completed")
+
+        return model_trainer_artifact
 

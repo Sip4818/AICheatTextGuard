@@ -1,28 +1,37 @@
 stages:
   ingest_data:
-    cmd: python -m src.pipeline.ingest_data
+    cmd: python -m src.pipeline.training.ingest_data
     deps:
-      - src/pipeline/ingest_data.py
+      - src/pipeline/training/ingest_data.py
       - src/components/data_ingestion.py
       - config/config.yaml
     outs:
       - data/raw
 
   validate_data:
-    cmd: python -m src.pipeline.validate_data
+    cmd: python -m src.pipeline.training.validate_data
     deps:
-      - src/pipeline/validate_data.py
+      - src/pipeline/training/validate_data.py
       - src/components/data_validation.py
       - data/raw
     outs:
       - artifact/data_validation
 
   transform_data:
-    cmd: python -m src.pipeline.transform_data
+    cmd: python -m src.pipeline.training.transform_data
     deps:
-      - src/pipeline/transform_data.py
+      - src/pipeline/training/transform_data.py
       - src/components/data_transformation.py
       - data/raw
     outs:
       - data/transformed
       - artifact/data_transformation
+
+  model_trainer:
+    cmd: python -m src.pipeline.training.model_trainer
+    deps:
+      - src/pipeline/training/model_trainer.py
+      - src/components/model_trainer.py
+      - data/transformed
+    outs:
+      - artifact/model_trainer

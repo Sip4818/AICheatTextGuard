@@ -123,9 +123,11 @@ class ConfigurationManager:
             return ModelTrainerConfig(
                 transformed_train_data_path=self.data_transformation_cfg.transformed_train_data_path,
                 transformed_test_data_path=self.data_transformation_cfg.transformed_test_data_path,
-                lr_level_1_model_path=self.model_trainer_cfg.lr_level_1_path,
-                xgb_level_1_model_path=self.model_trainer_cfg.xgb_level_1_path,
+                preprocessing_object_path=self.data_transformation_cfg.data_transformation_object_path,
+                lr_level1_model_path=self.model_trainer_cfg.lr_level_1_path,
+                xgb_level1_model_path=self.model_trainer_cfg.xgb_level_1_path,
                 meta_lr_path=self.model_trainer_cfg.meta_lr_path,
+                enable_tuning=self.model_trainer_cfg.enable_tuning,
                 final_model_path=self.model_trainer_cfg.final_model_path,
                 lr_level1_oof_predictions_path=self.model_trainer_cfg.lr_level1_oof_predictions_path,
                 xgb_level1_oof_predictions_path=self.model_trainer_cfg.xgb_level1_oof_predictions_path
@@ -155,7 +157,7 @@ class ConfigurationManager:
             xgb_final = XGBFinalParams(**self.final_params_cfg.level1.xgb)
 
             level1_final = Level1FinalParams(lr=lr_final, xgb=xgb_final)
-            level2_final = Level2FinalParams(**self.final_params_cfg.level2.lr)
+            level2_final = Level2FinalParams(lr=LRFinalParams(**self.final_params_cfg.level2.lr))
 
             return ModelTrainerFinalParamsConfig(
                 folds=self.final_params_cfg.train.folds,

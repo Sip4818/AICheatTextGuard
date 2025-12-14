@@ -35,10 +35,11 @@ class DataTransformationConfig:
 class ModelTrainerConfig:
     transformed_train_data_path: str
     transformed_test_data_path: str
+    preprocessing_object_path: str
     lr_level1_model_path: str
     xgb_level1_model_path: str
     meta_lr_path: str
-    final_mode_path: str
+    enable_tuning: bool
+    final_model_path: str
     lr_level1_oof_predictions_path: str
     xgb_level1_oof_predictions_path: str
-    final_model_path: str

@@ -1,3 +1,4 @@
+import logging
 import os
 from pickle import NONE
 import yaml
@@ -100,8 +101,19 @@ def read_csv_file(file_path: str) -> pd.DataFrame:
         raise AITextException(e)
 
 
-def save_model(model: object, model_path: str) -> None:
-    """ save model"""
+def read_object(model_path: str) -> object:
+    """read object or a model as pkl"""
+    try:
+        if not os.path.exists(model_path):
+            raise AITextException('Model does not exist')
+        return joblib.load(model_path)
+    except Exception as e:
+        logger.error(f'Could not read the model {model_path}')
+        raise AITextException(e)
+
+
+def save_object(model: object, model_path: str) -> None:
+    """ save object or a model as pkl"""
     try:
         dir_path=os.path.dirname(model_path)
         if dir_path:

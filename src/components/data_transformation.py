@@ -9,7 +9,7 @@ from sklearn.pipeline import Pipeline
 from src.utils.logger import logger
 from src.utils.common import (
     read_csv_file, save_numpy, assert_file_exists, 
-    log_file_size, save_model
+    log_file_size, save_object
 )
 from src.utils.exception import AITextException
 from src.entity.config_entity import DataTransformationConfig
@@ -76,7 +76,7 @@ class DataTransformation:
             log_file_size(self.cfg.transformed_test_data_path, "Test numpy")
 
             # Save pipeline
-            save_model(pipeline, self.cfg.data_transformation_object_path)
+            save_object(pipeline, self.cfg.data_transformation_object_path)
             assert_file_exists(self.cfg.data_transformation_object_path, "Transform pipeline")
             log_file_size(self.cfg.data_transformation_object_path, "Pipeline")
 

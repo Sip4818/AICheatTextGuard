@@ -29,7 +29,7 @@ model_trainer:
     lr_level_1_path: artifact/model_trainer/lr_level1.pkl
     xgb_level_1_path: artifact/model_trainer/xgb_level1.pkl
     meta_lr_path: artifact/model_trainer/meta_lr.pkl
-
+    enable_tuning: true
     final_model_path: artifact/model_trainer/stacked_model.pkl
 
     lr_level1_oof_predictions_path: artifact/model_trainer/level1_oof/lr_oof.npy
@@ -41,7 +41,7 @@ model_trainer:
             lr:
                 C: {type: float, low: 0.001, high: 10.0, log: true}
                 penalty: ["l1", "l2"]
-                solver: ["liblinear", "lbfgs", "saga"]
+                solver: ["liblinear", "saga"]
                 max_iter: {type: int, low: 300, high: 1000}
 
             xgb:
@@ -51,14 +51,15 @@ model_trainer:
                 subsample: [0.6, 0.7, 0.8, 1.0]
                 colsample_bytree: [0.5, 0.7, 0.8, 1.0]
                 min_child_weight: {type: int, low: 1, high: 7}
-                gamma: {type: float, low: 0.0, high: 0.5}
-                reg_alpha: {type: float, low: 0.0, high: 1.0, log: true}
+                gamma: {type: float, low: 0.001, high: 0.5}
+                reg_alpha: {type: float, low: 0.001, high: 1.0, log: true}
                 reg_lambda: {type: float, low: 0.1, high: 5.0, log: true}
+
 
         level2:
 
             lr:
                 C: {type: float, low: 0.001, high: 10.0, log: true}
                 penalty: ["l2"]
-                solver: ["lbfgs", "liblinear"]
+                solver: ["saga", "liblinear"]
                 max_iter: {type: int, low: 300, high: 1000}
