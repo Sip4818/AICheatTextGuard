@@ -63,3 +63,6 @@ model_trainer:
                 penalty: ["l2"]
                 solver: ["saga", "liblinear"]
                 max_iter: {type: int, low: 300, high: 1000}
+
+prediction:
+    final_model_path: artifact/model_trainer/stacked_model.pkl

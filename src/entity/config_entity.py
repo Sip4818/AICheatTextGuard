@@ -43,3 +43,7 @@ class ModelTrainerConfig:
     final_model_path: str
     lr_level1_oof_predictions_path: str
     xgb_level1_oof_predictions_path: str
+
+@dataclass
+class PredictionConfig:
+    final_trained_model_path: str

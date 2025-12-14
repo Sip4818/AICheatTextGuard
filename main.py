@@ -1,4 +1,4 @@
-from src.pipeline.training_pipeline import TrainingPipeline
+from src.pipeline.training.training_pipeline import TrainingPipeline
 from dotenv import load_dotenv
 load_dotenv()
 from src.utils.logger import logging
@@ -11,8 +11,8 @@ if __name__ == "__main__":
     pipeline = TrainingPipeline()
     pipeline.start_data_ingestion()
     pipeline.start_data_validation()
-
     pipeline.start_data_transformation()
+    pipeline.start_model_trainer()
     logging.info("Training Pipeline Completed.")
 
 

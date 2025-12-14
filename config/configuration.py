@@ -7,7 +7,8 @@ from src.utils.logger import logger
 
 from src.entity.config_entity import (
     DataIngestionConfig, DataValidationConfig, 
-    DataTransformationConfig, ModelTrainerConfig
+    DataTransformationConfig, ModelTrainerConfig,
+    PredictionConfig
 )
 from src.entity.model_trainer_tuning_entity import (
     LRSpace, XGBSpace, Level1TuningConfig, 
@@ -15,12 +16,13 @@ from src.entity.model_trainer_tuning_entity import (
 )
 from src.entity.model_trainer_final_params_entity import (
     LRFinalParams, XGBFinalParams, Level1FinalParams, 
-    Level2FinalParams, ModelTrainerFinalParamsConfig
+    Level2FinalParams, ModelTrainerFinalParamsConfig,
 )
 
 from src.constants.constants import (
     config_yaml_file_path, schema_yaml_file_path, params_yaml_file_path
 )
+
 
 
 class ConfigurationManager:
@@ -52,6 +54,7 @@ class ConfigurationManager:
         self.model_trainer_cfg = self.config.model_trainer
         self.tuning_cfg = self.config.model_trainer.tuning
         self.final_params_cfg = self.params.model_trainer
+        self.prediction_cfg = self.config.prediction
 
 
 
@@ -167,3 +170,9 @@ class ConfigurationManager:
         except Exception as e:
             logger.error("Failed to build ModelTrainerFinalParamsConfig")
             raise AITextException(e)
+
+    def get_prediction_config(self):
+
+        return PredictionConfig(
+            final_trained_model_path= self.prediction_cfg.final_model_path
+        )
