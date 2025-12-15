@@ -1,13 +1,17 @@
 from src.utils.logger import logger
 from src.utils.exception import AITextException
-from src.utils.common import save_object,read_object, save_numpy, log_file_size, assert_file_exists, read_numpy
+from src.utils.common import (
+    save_object,read_object,save_numpy, 
+    log_file_size, assert_file_exists,
+    read_numpy, write_yaml, extract_params,
+    to_dict)
 from src.entity.config_entity import ModelTrainerConfig
 from src.entity.model_trainer_tuning_entity import ModelTrainerTuningConfig
 from src.entity.model_trainer_final_params_entity import ModelTrainerFinalParamsConfig
 from src.entity.artifact_entity import ModelTrainerArtifact
 from src.tuning.tuner import Tuner
 from src.model.stack_model import StackedModel
-from src.constants.constants  import SEED
+from src.constants.constants  import SEED, LR_KEYS, XGB_KEYS, params_dict_format, params_yaml_file_path
 
 import os
 import numpy as np
@@ -31,7 +35,7 @@ class ModelTrainer:
   
     def _generate_oof_xgb_preds(self,X,y,best_params_xgb_lvl1) -> np.ndarray:
         try:
-            N_FOLDS = self.model_trainer_final_params_config.folds
+            N_FOLDS = self.model_trainer_config.folds
             oof_preds_xgb = np.zeros(X.shape[0])
             skf = StratifiedKFold(n_splits=N_FOLDS, shuffle=True, random_state=SEED)
             for i, (train_index, val_index) in enumerate(skf.split(X, y)):
@@ -64,7 +68,7 @@ class ModelTrainer:
     
     def _generate_oof_lr_preds(self,X,y,best_params_lr_lvl1) -> np.ndarray :
         try:
-            N_FOLDS = self.model_trainer_final_params_config.folds
+            N_FOLDS = self.model_trainer_config.folds
 
             skf=StratifiedKFold(n_splits=N_FOLDS, shuffle=True, random_state=SEED)
             oof_preds_lr = np.zeros(X.shape[0]) # Initialize OOF array with size of X
@@ -145,13 +149,24 @@ class ModelTrainer:
                 tuner = Tuner(tuning_cfg= self.model_trainer_tuning_config)
 
                 best_params_lr_lvl1=tuner.tune_lr_level1(X,y)
+                lvl1_lr_params_cleaned=extract_params(best_params_lr_lvl1, LR_KEYS)
                 best_params_xgb_lvl1=tuner.tune_xgb_level1(X,y)
+                lvl1_xgb_params_cleaned =extract_params(best_params_xgb_lvl1, XGB_KEYS)
+
+                params_dict_format.model_trainer.level1.lr= lvl1_lr_params_cleaned
+                params_dict_format.model_trainer.level1.xgb= lvl1_xgb_params_cleaned
+
 
                 oof_preds_xgb=self._generate_oof_xgb_preds(X,y,best_params_xgb_lvl1)
                 oof_preds_lr=self._generate_oof_lr_preds(X,y,best_params_lr_lvl1)
 
                 X_meta = np.column_stack([oof_preds_xgb,oof_preds_lr])
                 best_params_lr_lvl2=tuner.tune_lr_level2(X_meta,y)
+                lvl2_lr_params_cleaned =extract_params(best_params_lr_lvl2, LR_KEYS)
+                params_dict_format.model_trainer.level2.lr= lvl2_lr_params_cleaned
+                print(params_dict_format)
+                write_yaml(to_dict(params_dict_format), params_yaml_file_path)
+
             else:
                 best_params_lr_lvl1=self.model_trainer_final_params_config.model_trainer.level1.lr
                 best_params_xgb_lvl1=self.model_trainer_final_params_config.model_trainer.level1.xgb
@@ -164,6 +179,7 @@ class ModelTrainer:
             self.train(X,y,oof_preds_xgb,oof_preds_lr,best_params_xgb_lvl1,best_params_lr_lvl1,best_params_lr_lvl2)
             Stacked_model=StackedModel(**self.object_storage)
             save_object(Stacked_model, self.model_trainer_config.final_model_path)
+
             return ModelTrainerArtifact(
                 model_path= os.path.dirname(self.model_trainer_config.final_model_path)
             )

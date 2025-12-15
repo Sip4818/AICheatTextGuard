@@ -16,6 +16,11 @@ def assert_file_exists(path: str, label: str = "File") -> None:
     if not os.path.exists(path):
         raise AITextException(f"{label} does not exist at path: {path}")
 
+def is_yaml_content_empty(file_path: str) -> bool:
+    with open(file_path, "r") as f:
+        data = yaml.safe_load(f)
+    return data is None or data == {}
+
 def read_yaml(path: str) -> ConfigBox:
     """Read yaml file"""
     logger.info(f"Reading YAML file: {path}")
@@ -43,6 +48,22 @@ def read_yaml(path: str) -> ConfigBox:
     except Exception as e:
         logger.error(f"Could not read YAML file: {path}")
         raise AITextException(e)
+
+
+import yaml
+from pathlib import Path
+
+def write_yaml(data: dict, file_path: str) -> None:
+    path = Path(file_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(path, "w") as f:
+        yaml.safe_dump(
+            data,
+            f,
+            default_flow_style=False,
+            sort_keys=False
+        )
 
 
 def create_dir(path: str, name: str) -> None:
@@ -160,4 +181,26 @@ def save_numpy(array: np.ndarray, path: str ) -> None:
         logger.error(f"Failed to save numpy array at {path}")
         raise AITextException(e)
 
-    
+def extract_params(source: dict, keys: list[str]) -> dict:
+    clean = {}
+    for k in keys:
+        v = source[k]
+        if isinstance(v, (int, float, str, bool)):
+            clean[k] = v
+        else:
+            clean[k] = float(v)
+    return clean
+from box import ConfigBox
+
+def to_dict(obj):
+    """
+    Recursively convert ConfigBox / objects to pure Python dict
+    """
+    if isinstance(obj, ConfigBox):
+        return {k: to_dict(v) for k, v in obj.items()}
+    elif isinstance(obj, dict):
+        return {k: to_dict(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [to_dict(v) for v in obj]
+    else:
+        return obj

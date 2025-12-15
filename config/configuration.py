@@ -1,14 +1,13 @@
 import os
 
 from config.training_pipeline_config import TrainingPipelineConfig
-from src.utils.common import read_yaml, create_dir
+from src.utils.common import read_yaml, create_dir, write_yaml, is_yaml_content_empty, to_dict
 from src.utils.exception import AITextException
 from src.utils.logger import logger
 
 from src.entity.config_entity import (
     DataIngestionConfig, DataValidationConfig, 
-    DataTransformationConfig, ModelTrainerConfig,
-    PredictionConfig
+    DataTransformationConfig, ModelTrainerConfig
 )
 from src.entity.model_trainer_tuning_entity import (
     LRSpace, XGBSpace, Level1TuningConfig, 
@@ -20,7 +19,8 @@ from src.entity.model_trainer_final_params_entity import (
 )
 
 from src.constants.constants import (
-    config_yaml_file_path, schema_yaml_file_path, params_yaml_file_path
+    config_yaml_file_path, schema_yaml_file_path,
+      params_yaml_file_path, params_dict_format
 )
 
 
@@ -36,6 +36,8 @@ class ConfigurationManager:
         # Read YAMLs
         self.config = read_yaml(yaml_file_path)
         self.schema = read_yaml(schema_file_path)
+        if is_yaml_content_empty(params_file_path):
+            write_yaml(to_dict(params_dict_format),params_file_path)
         self.params = read_yaml(params_file_path)
 
         logger.info("Config, schema, and params YAML files loaded")
@@ -122,6 +124,8 @@ class ConfigurationManager:
 
             create_dir(os.path.dirname(self.model_trainer_cfg.lr_level1_oof_predictions_path),
                             "LR OOF predictions")
+            
+            create_dir(os.path.dirname(self.model_trainer_cfg.final_model_path), "Final model path")
 
             return ModelTrainerConfig(
                 transformed_train_data_path=self.data_transformation_cfg.transformed_train_data_path,
@@ -133,7 +137,8 @@ class ConfigurationManager:
                 enable_tuning=self.model_trainer_cfg.enable_tuning,
                 final_model_path=self.model_trainer_cfg.final_model_path,
                 lr_level1_oof_predictions_path=self.model_trainer_cfg.lr_level1_oof_predictions_path,
-                xgb_level1_oof_predictions_path=self.model_trainer_cfg.xgb_level1_oof_predictions_path
+                xgb_level1_oof_predictions_path=self.model_trainer_cfg.xgb_level1_oof_predictions_path,
+                folds= self.model_trainer_cfg.folds
             )
         except Exception as e:
             logger.error("Failed to build ModelTrainerConfig")
@@ -163,7 +168,6 @@ class ConfigurationManager:
             level2_final = Level2FinalParams(lr=LRFinalParams(**self.final_params_cfg.level2.lr))
 
             return ModelTrainerFinalParamsConfig(
-                folds=self.final_params_cfg.train.folds,
                 level1=level1_final,
                 level2=level2_final
             )
@@ -171,8 +175,3 @@ class ConfigurationManager:
             logger.error("Failed to build ModelTrainerFinalParamsConfig")
             raise AITextException(e)
 
-    def get_prediction_config(self):
-
-        return PredictionConfig(
-            final_trained_model_path= self.prediction_cfg.final_model_path
-        )

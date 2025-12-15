@@ -43,6 +43,7 @@ class ModelTrainerConfig:
     final_model_path: str
     lr_level1_oof_predictions_path: str
     xgb_level1_oof_predictions_path: str
+    folds: int
 
 @dataclass
 class PredictionConfig:
