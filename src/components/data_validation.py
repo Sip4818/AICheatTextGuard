@@ -2,20 +2,16 @@ import json
 import pandas as pd
 from src.entity.config_entity import DataValidationConfig
 from src.entity.artifact_entity import DataValidationArtifact
+from src.constants.constants import validation_report_tempelate
 from src.utils.common import read_csv_file
 from src.utils.logger import logger
 from src.utils.exception import AITextException
 
-class DataValidation:
 
+class DataValidation:
     def __init__(self, cfg: DataValidationConfig) -> None:
         self.cfg = cfg
-        self.report = {
-            "schema_check": {},
-            "missing_values_check": {},
-            "allowed_values_check": {},
-            "dtype_check": {}
-        }
+        self.report = validation_report_tempelate
 
     def validate_schema(self, df) -> None:
         required = set(self.cfg.required_columns)
@@ -25,7 +21,7 @@ class DataValidation:
 
         self.report["schema_check"] = {
             "status": len(missing) == 0,
-            "missing_columns": missing
+            "missing_columns": missing,
         }
 
     def validate_missing_values(self, df) -> None:
@@ -34,14 +30,13 @@ class DataValidation:
 
         self.report["missing_values_check"] = {
             "status": status,
-            "details": missing_info
+            "details": missing_info,
         }
 
     def validate_allowed_values(self, df) -> None:
         invalid_rows = {}
 
         for column, allowed in self.cfg.allowed_values.items():
-
             if column not in df.columns:
                 invalid_rows[column] = "Column missing"
                 continue
@@ -53,29 +48,28 @@ class DataValidation:
 
         self.report["allowed_values_check"] = {
             "status": len(invalid_rows) == 0,
-            "invalid_rows": invalid_rows
+            "invalid_rows": invalid_rows,
         }
 
     def validate_dtype(self, df) -> None:
         mismatches = {}
 
         for col, expected_dtype in self.cfg.columns_dtype.items():
-
             if col not in df.columns:
-                mismatches[col] = {"expected": expected_dtype, "found": "Column missing"}
+                mismatches[col] = {
+                    "expected": expected_dtype,
+                    "found": "Column missing",
+                }
                 continue
 
             actual_dtype = str(df[col].dtype)
 
             if expected_dtype not in actual_dtype:
-                mismatches[col] = {
-                    "expected": expected_dtype,
-                    "found": actual_dtype
-                }
+                mismatches[col] = {"expected": expected_dtype, "found": actual_dtype}
 
         self.report["dtype_check"] = {
             "status": len(mismatches) == 0,
-            "mismatched_dtypes": mismatches
+            "mismatched_dtypes": mismatches,
         }
 
     def _write_report(self, path: str) -> None:
@@ -97,7 +91,7 @@ class DataValidation:
             df_test = read_csv_file(self.cfg.raw_test_data_path)
 
             self._validate_df(df_train, "Train Dataset")
-            # self._validate_df(df_test, "Test Dataset")
+            self._validate_df(df_test, "Test Dataset")
 
             self._write_report(self.cfg.data_validation_report_path)
 

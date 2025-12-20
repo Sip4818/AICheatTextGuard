@@ -4,17 +4,14 @@ from ._search_spaces import SearchSpaces
 
 
 class Tuner:
-
     def __init__(self, tuning_cfg):
         """
         tuning_cfg: ModelTrainerTuningConfig
         """
         self.cfg = tuning_cfg
 
-
         # Shared search space builder
         self.search_spaces = SearchSpaces(cfg=tuning_cfg)
-
 
     def tune_xgb_level1(self, X_train, y_train, n_trials=1):
         """
@@ -23,16 +20,16 @@ class Tuner:
         objective = Objective(
             model_name="xgb",
             search_spaces=self.search_spaces,
-            cfg=self.cfg.level1.xgb,   # YAML block for Level-1 XGB
+            cfg=self.cfg.level1.xgb,  # YAML block for Level-1 XGB
             X=X_train,
-            y=y_train
+            y=y_train,
         )
 
         study = optuna.create_study(direction="maximize")
         study.optimize(objective, n_trials=n_trials)
 
         return study.best_params
-    
+
     def tune_lr_level1(self, X_train, y_train, n_trials=1):
         """
         Tune lr (Level-1)
@@ -40,9 +37,9 @@ class Tuner:
         objective = Objective(
             model_name="lr",
             search_spaces=self.search_spaces,
-            cfg=self.cfg.level1.lr,   # YAML block for Level-1 lr
+            cfg=self.cfg.level1.lr,  # YAML block for Level-1 lr
             X=X_train,
-            y=y_train
+            y=y_train,
         )
 
         study = optuna.create_study(direction="maximize")
@@ -63,9 +60,9 @@ class Tuner:
         objective = Objective(
             model_name="lr",
             search_spaces=self.search_spaces,
-            cfg=self.cfg.level2.lr,   
+            cfg=self.cfg.level2.lr,
             X=X_meta,
-            y=y_train     
+            y=y_train,
         )
 
         study = optuna.create_study(direction="maximize")

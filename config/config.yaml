@@ -3,10 +3,10 @@ data_root: data
 
 data_ingestion:
     root_dir: data/raw
-    cloud_train_data_path: "data/raw/train.csv"
-    cloud_test_data_path: "data/raw/test.csv"
+    cloud_data_path: "data/raw/train.csv"
+    test_split_size: 0.2
     bucket_name: "ai_text_guard_bucket"
-    local_data_dir: data/raw
+    local_data_path: data/raw/data.csv
     local_train_path: data/raw/train.csv
     local_test_path: data/raw/test.csv
   
@@ -18,8 +18,6 @@ data_transformation:
     artifact_root_dir: artifact/data_transformation
     data_root_dir: data/transformed
     transformed_train_data_path: data/transformed/train.npy
-    transformed_test_data_path: data/transformed/test.npy
-    transformed_val_data_path: data/transformed/val.npy
     temp_model_dir: temp
     data_transformation_object_path: artifact/data_transformation/text_features_preprocessor.pkl
     test_split_size: 0.2
@@ -29,7 +27,7 @@ model_trainer:
     lr_level_1_path: artifact/model_trainer/lr_level1.pkl
     xgb_level_1_path: artifact/model_trainer/xgb_level1.pkl
     meta_lr_path: artifact/model_trainer/meta_lr.pkl
-    enable_tuning: true
+    enable_tuning: false
     final_model_path: model/stacked_model.pkl
 
     lr_level1_oof_predictions_path: artifact/model_trainer/level1_oof/lr_oof.npy
@@ -37,6 +35,7 @@ model_trainer:
     folds: 5
     
     tuning:
+        number_of_trials: 20
         level1:
             lr:
                 C: {type: float, low: 0.001, high: 10.0, log: true}
@@ -64,5 +63,8 @@ model_trainer:
                 solver: ["saga", "liblinear"]
                 max_iter: {type: int, low: 300, high: 1000}
 
-prediction:
-    final_model_path: artifact/model_trainer/stacked_model.pkl
+model_evaluation:
+    root_dir: artifact/model_evaluation
+    metrices: ['auc_ruc']
+    model_evaluation_file_path: artifact/model_evaluation/model_evaluation.txt
+        

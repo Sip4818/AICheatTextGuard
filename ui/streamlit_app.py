@@ -15,11 +15,7 @@ if st.button("Predict"):
     if not topic or not id or not answer:
         st.warning("Please fill all fields")
     else:
-        payload = {
-            "id": id,
-            "topic": topic,
-            "answer": answer
-        }
+        payload = {"id": id, "topic": topic, "answer": answer}
 
         with st.spinner("Analyzing..."):
             response = requests.post(API_URL, json=payload)

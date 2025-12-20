@@ -1,23 +1,23 @@
 model_trainer:
   level1:
     lr:
-      C: 0.029915342411444733
-      penalty: l1
-      solver: liblinear
-      max_iter: 352
-    xgb:
-      n_estimators: 505
-      max_depth: 7
-      learning_rate: 0.040318993401943254
-      subsample: 0.7
-      colsample_bytree: 1.0
-      min_child_weight: 3
-      gamma: 0.20383591591253322
-      reg_alpha: 0.021465255950153906
-      reg_lambda: 1.3805160989872147
-  level2:
-    lr:
-      C: 0.005870629105439075
+      C: 8.769796214828984
       penalty: l2
       solver: liblinear
-      max_iter: 922
+      max_iter: 302
+    xgb:
+      n_estimators: 696
+      max_depth: 7
+      learning_rate: 0.03505829025336762
+      subsample: 0.6
+      colsample_bytree: 1.0
+      min_child_weight: 1
+      gamma: 0.09937972929557916
+      reg_alpha: 0.16720056368346373
+      reg_lambda: 0.19722573328119694
+  level2:
+    lr:
+      C: 7.879506944724206
+      penalty: l2
+      solver: saga
+      max_iter: 339

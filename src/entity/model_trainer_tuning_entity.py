@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Dict
 
+
 @dataclass
 class LRSpace:
     C: List[float]
@@ -35,6 +36,6 @@ class Level2TuningConfig:
 
 @dataclass
 class ModelTrainerTuningConfig:
+    n_trials: int
     level1: Level1TuningConfig
     level2: Level2TuningConfig
-

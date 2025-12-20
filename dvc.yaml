@@ -33,5 +33,14 @@ stages:
       - src/pipeline/training/model_trainer.py
       - src/components/model_trainer.py
       - data/transformed
+      - config/config.yaml
     outs:
       - artifact/model_trainer
+
+  model_evaluation:
+    cmd: python -m src.pipeline.training.model_evalute
+    deps:
+      - config/config.yaml
+      - src/components/model_evaluation.py
+    outs:
+      - artifact/model_evaluation

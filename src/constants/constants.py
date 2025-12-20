@@ -1,22 +1,20 @@
-
-from box import ConfigBox
-#Pipeline config 
-data_root= "data"
-artifacts_root= "artifact"
+# Pipeline config
+data_root = "data"
+artifacts_root = "artifact"
 config_yaml_file_path = "config/config.yaml"
 
-SEED=42
+SEED = 42
 
-schema_yaml_file_path="data_schema/schema.yaml"
+schema_yaml_file_path = "data_schema/schema.yaml"
 
-params_yaml_file_path="params.yaml"
+params_yaml_file_path = "params.yaml"
 
-#Data Ingestion Config
-bucket_name="ai_text_guard_bucket"
-test_file_name="train.csv"
-train_file_name="test.csv"
+# Data Ingestion Config
+bucket_name = "ai_text_guard_bucket"
+test_file_name = "train.csv"
+train_file_name = "test.csv"
 
-#Validation 
+# Validation
 
 
 LR_KEYS = ["C", "penalty", "solver", "max_iter"]
@@ -32,9 +30,8 @@ XGB_KEYS = [
     "reg_alpha",
     "reg_lambda",
 ]
-from box import ConfigBox
 
-params_dict_format = ConfigBox({
+params_dict_format = {
     "model_trainer": {
         "level1": {
             "lr": {
@@ -62,20 +59,14 @@ params_dict_format = ConfigBox({
                 "solver": "lbfgs",
                 "max_iter": 100,
             }
-        }
+        },
     }
-})
+}
+validation_report_tempelate = {
+            "schema_check": {},
+            "missing_values_check": {},
+            "allowed_values_check": {},
+            "dtype_check": {},
+        }
 
-
-final_model_path="model/stacked_model.pkl"
-
-
-
-
-
-
-
-
-
-
-
+final_model_path = "model/stacked_model.pkl"

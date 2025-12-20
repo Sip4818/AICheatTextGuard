@@ -1,43 +1,58 @@
 import os
 
 from config.training_pipeline_config import TrainingPipelineConfig
-from src.utils.common import read_yaml, create_dir, write_yaml, is_yaml_content_empty, to_dict
+from src.utils.common import (
+    read_yaml,
+    create_dir,
+    write_yaml,
+    is_yaml_content_empty
+)
 from src.utils.exception import AITextException
 from src.utils.logger import logger
 
 from src.entity.config_entity import (
-    DataIngestionConfig, DataValidationConfig, 
-    DataTransformationConfig, ModelTrainerConfig
+    DataIngestionConfig,
+    DataValidationConfig,
+    DataTransformationConfig,
+    ModelTrainerConfig,
+    ModelEvaluationConfig
 )
 from src.entity.model_trainer_tuning_entity import (
-    LRSpace, XGBSpace, Level1TuningConfig, 
-    Level2TuningConfig, ModelTrainerTuningConfig
+    LRSpace,
+    XGBSpace,
+    Level1TuningConfig,
+    Level2TuningConfig,
+    ModelTrainerTuningConfig,
 )
 from src.entity.model_trainer_final_params_entity import (
-    LRFinalParams, XGBFinalParams, Level1FinalParams, 
-    Level2FinalParams, ModelTrainerFinalParamsConfig,
+    LRFinalParams,
+    XGBFinalParams,
+    Level1FinalParams,
+    Level2FinalParams,
+    ModelTrainerFinalParamsConfig,
 )
 
 from src.constants.constants import (
-    config_yaml_file_path, schema_yaml_file_path,
-      params_yaml_file_path, params_dict_format
+    config_yaml_file_path,
+    schema_yaml_file_path,
+    params_yaml_file_path,
+    params_dict_format,
 )
 
 
-
 class ConfigurationManager:
-
-    def __init__(self,
-                 training_pipeline_config: TrainingPipelineConfig,
-                 yaml_file_path: str = config_yaml_file_path,
-                 schema_file_path: str = schema_yaml_file_path,
-                 params_file_path: str = params_yaml_file_path):
-
+    def __init__(
+        self,
+        training_pipeline_config: TrainingPipelineConfig,
+        yaml_file_path: str = config_yaml_file_path,
+        schema_file_path: str = schema_yaml_file_path,
+        params_file_path: str = params_yaml_file_path,
+    ):
         # Read YAMLs
         self.config = read_yaml(yaml_file_path)
         self.schema = read_yaml(schema_file_path)
         if is_yaml_content_empty(params_file_path):
-            write_yaml(to_dict(params_dict_format),params_file_path)
+            write_yaml(params_dict_format, params_file_path)
         self.params = read_yaml(params_file_path)
 
         logger.info("Config, schema, and params YAML files loaded")
@@ -56,9 +71,7 @@ class ConfigurationManager:
         self.model_trainer_cfg = self.config.model_trainer
         self.tuning_cfg = self.config.model_trainer.tuning
         self.final_params_cfg = self.params.model_trainer
-        self.prediction_cfg = self.config.prediction
-
-
+        self.model_evaluation_cfg = self.config.model_evaluation
 
     # 1. Data Ingestion
     def get_data_ingestion_config(self) -> DataIngestionConfig:
@@ -66,12 +79,12 @@ class ConfigurationManager:
             create_dir(self.data_ingestion_cfg.root_dir, "Data ingestion root")
 
             return DataIngestionConfig(
-                cloud_train_path=self.data_ingestion_cfg.cloud_train_data_path,
-                cloud_test_path=self.data_ingestion_cfg.cloud_test_data_path,
+                cloud_data_path=self.data_ingestion_cfg.cloud_data_path,
                 bucket_name=self.data_ingestion_cfg.bucket_name,
-                local_data_dir=self.data_ingestion_cfg.local_data_dir,
+                local_data_path=self.data_ingestion_cfg.local_data_path,
                 local_train_path=self.data_ingestion_cfg.local_train_path,
-                local_test_path=self.data_ingestion_cfg.local_test_path
+                local_test_path=self.data_ingestion_cfg.local_test_path,
+                test_split_size=self.data_ingestion_cfg.test_split_size
             )
         except Exception as e:
             logger.error("Failed to build DataIngestionConfig")
@@ -88,30 +101,31 @@ class ConfigurationManager:
                 data_validation_report_path=self.data_validation_cfg.validated_data_report_file_path,
                 required_columns=self.schema.required_columns,
                 columns_dtype=self.schema.columns_dtype,
-                allowed_values=self.schema.allowed_values
+                allowed_values=self.schema.allowed_values,
             )
         except Exception as e:
             logger.error("Failed to build DataValidationConfig")
             raise AITextException(e)
-            
 
     # 3. Data Transformation
     def get_data_transformation_config(self) -> DataTransformationConfig:
         try:
-            create_dir(self.data_transformation_cfg.data_root_dir, "Data transformation root")
-            create_dir(self.data_transformation_cfg.artifact_root_dir, "Transformation artifacts")
+            create_dir(
+                self.data_transformation_cfg.data_root_dir, "Data transformation root"
+            )
+            create_dir(
+                self.data_transformation_cfg.artifact_root_dir,
+                "Transformation artifacts",
+            )
             create_dir(self.data_transformation_cfg.temp_model_dir, "Temporary models")
 
             return DataTransformationConfig(
                 validated_data_train_path=self.data_ingestion_cfg.local_train_path,
-                validated_data_test_path=self.data_ingestion_cfg.local_test_path,
                 transformed_train_data_path=self.data_transformation_cfg.transformed_train_data_path,
-                transformed_test_data_path=self.data_transformation_cfg.transformed_test_data_path,
-                transformed_val_data_path=self.data_transformation_cfg.transformed_val_data_path,
                 data_transformation_object_path=self.data_transformation_cfg.data_transformation_object_path,
                 temp_model_dir=self.data_transformation_cfg.temp_model_dir,
                 target_column_name=self.schema.target_column_name,
-                test_split_size=self.data_transformation_cfg.test_split_size
+                test_split_size=self.data_transformation_cfg.test_split_size,
             )
         except Exception as e:
             logger.error("Failed to build DataTransformationConfig")
@@ -122,14 +136,18 @@ class ConfigurationManager:
         try:
             create_dir(self.model_trainer_cfg.root_dir, "Model trainer root")
 
-            create_dir(os.path.dirname(self.model_trainer_cfg.lr_level1_oof_predictions_path),
-                            "LR OOF predictions")
-            
-            create_dir(os.path.dirname(self.model_trainer_cfg.final_model_path), "Final model path")
+            create_dir(
+                os.path.dirname(self.model_trainer_cfg.lr_level1_oof_predictions_path),
+                "LR OOF predictions",
+            )
+
+            create_dir(
+                os.path.dirname(self.model_trainer_cfg.final_model_path),
+                "Final model path",
+            )
 
             return ModelTrainerConfig(
                 transformed_train_data_path=self.data_transformation_cfg.transformed_train_data_path,
-                transformed_test_data_path=self.data_transformation_cfg.transformed_test_data_path,
                 preprocessing_object_path=self.data_transformation_cfg.data_transformation_object_path,
                 lr_level1_model_path=self.model_trainer_cfg.lr_level_1_path,
                 xgb_level1_model_path=self.model_trainer_cfg.xgb_level_1_path,
@@ -138,12 +156,12 @@ class ConfigurationManager:
                 final_model_path=self.model_trainer_cfg.final_model_path,
                 lr_level1_oof_predictions_path=self.model_trainer_cfg.lr_level1_oof_predictions_path,
                 xgb_level1_oof_predictions_path=self.model_trainer_cfg.xgb_level1_oof_predictions_path,
-                folds= self.model_trainer_cfg.folds
+                folds=self.model_trainer_cfg.folds,
             )
         except Exception as e:
             logger.error("Failed to build ModelTrainerConfig")
             raise AITextException(e)
-        
+
     # 5. Model Trainer Tuning Config (Optuna)
     def get_model_trainer_tuning_config(self) -> ModelTrainerTuningConfig:
         try:
@@ -153,7 +171,11 @@ class ConfigurationManager:
             level1 = Level1TuningConfig(lr=lr_space, xgb=xgb_space)
             level2 = Level2TuningConfig(lr=LRSpace(**self.tuning_cfg.level2.lr))
 
-            return ModelTrainerTuningConfig(level1=level1, level2=level2)
+            return ModelTrainerTuningConfig(
+                level1=level1,
+                level2=level2,
+                n_trials=self.tuning_cfg.number_of_trials,
+            )
         except Exception as e:
             logger.error("Failed to build ModelTrainerTuningConfig")
             raise AITextException(e)
@@ -165,13 +187,30 @@ class ConfigurationManager:
             xgb_final = XGBFinalParams(**self.final_params_cfg.level1.xgb)
 
             level1_final = Level1FinalParams(lr=lr_final, xgb=xgb_final)
-            level2_final = Level2FinalParams(lr=LRFinalParams(**self.final_params_cfg.level2.lr))
+            level2_final = Level2FinalParams(
+                lr=LRFinalParams(**self.final_params_cfg.level2.lr)
+            )
 
             return ModelTrainerFinalParamsConfig(
-                level1=level1_final,
-                level2=level2_final
+                level1=level1_final, level2=level2_final
             )
         except Exception as e:
             logger.error("Failed to build ModelTrainerFinalParamsConfig")
             raise AITextException(e)
 
+    def get_model_evaluation_config(self) -> ModelEvaluationConfig:
+        try:
+            create_dir(self.model_evaluation_cfg.root_dir, 'Model evalutaion root artifact')
+
+            return ModelEvaluationConfig(
+                raw_test_data_path= self.data_ingestion_cfg.local_test_path,
+                final_model_path=self.model_trainer_cfg.final_model_path,
+                target_column_name=self.schema.target_column_name,
+                model_evaluation_artifact_file_path= self.model_evaluation_cfg.model_evaluation_file_path,
+                metrices=self.model_evaluation_cfg.metrices
+            )
+        except Exception as e:
+            logger.error("Failed to build model evaluation config")
+            raise AITextException(e)
+
+    

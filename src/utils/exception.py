@@ -1,6 +1,7 @@
 import sys
 import traceback
 
+
 class AITextException(Exception):
     def __init__(self, message):
         # Convert to string to avoid issues with non-string errors
@@ -25,10 +26,10 @@ class AITextException(Exception):
     def __str__(self):
         return f"{self.message} (File: {self.file}, Line: {self.line})"
 
+
 # if __name__=="__main__":
 #     try:
 #         logging.info("entered the function")
 #         a=1/0
 #     except Exception as e:
 #         raise AITextException(e)
-

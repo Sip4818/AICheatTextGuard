@@ -1,4 +1,4 @@
-import logging
+from operator import index
 import os
 from pickle import NONE
 import yaml
@@ -16,10 +16,12 @@ def assert_file_exists(path: str, label: str = "File") -> None:
     if not os.path.exists(path):
         raise AITextException(f"{label} does not exist at path: {path}")
 
+
 def is_yaml_content_empty(file_path: str) -> bool:
     with open(file_path, "r") as f:
         data = yaml.safe_load(f)
     return data is None or data == {}
+
 
 def read_yaml(path: str) -> ConfigBox:
     """Read yaml file"""
@@ -36,7 +38,9 @@ def read_yaml(path: str) -> ConfigBox:
             raise AITextException(f"YAML file is empty: {path}")
 
         if not isinstance(content, dict):
-            raise AITextException(f"Invalid YAML structure in {path}: Must be a dictionary")
+            raise AITextException(
+                f"Invalid YAML structure in {path}: Must be a dictionary"
+            )
 
         logger.info(f"YAML loaded successfully: {path}")
         return ConfigBox(content)
@@ -53,21 +57,17 @@ def read_yaml(path: str) -> ConfigBox:
 import yaml
 from pathlib import Path
 
+
 def write_yaml(data: dict, file_path: str) -> None:
     path = Path(file_path)
     path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(path, "w") as f:
-        yaml.safe_dump(
-            data,
-            f,
-            default_flow_style=False,
-            sort_keys=False
-        )
+        yaml.safe_dump(data, f, default_flow_style=False, sort_keys=False)
 
 
 def create_dir(path: str, name: str) -> None:
-    """ Create directory"""
+    """Create directory"""
     try:
         os.makedirs(path, exist_ok=True)
         logger.info(f"{name} directory created at: {path}")
@@ -121,22 +121,34 @@ def read_csv_file(file_path: str) -> pd.DataFrame:
         logger.error(f"Failed to read CSV: {file_path}")
         raise AITextException(e)
 
+def save_csv(df: pd.DataFrame, path: str) -> None:
+    try:
+        dir_path = os.path.dirname(path)
+        if dir_path:
+            os.makedirs(dir_path, exist_ok=True)
+        df.to_csv(path, index= False)
+
+        logger.info(f"CSV file saved at {path}")
+    except Exception as e:
+        logger.error(f"Failed to save csv at {path}")
+        raise AITextException(e)
+
 
 def read_object(model_path: str) -> object:
     """read object or a model as pkl"""
     try:
         if not os.path.exists(model_path):
-            raise AITextException('Model does not exist')
+            raise AITextException("Model does not exist")
         return joblib.load(model_path)
     except Exception as e:
-        logger.error(f'Could not read the model {model_path}')
+        logger.error(f"Could not read the model {model_path}")
         raise AITextException(e)
 
 
 def save_object(model: object, model_path: str) -> None:
-    """ save object or a model as pkl"""
+    """save object or a model as pkl"""
     try:
-        dir_path=os.path.dirname(model_path)
+        dir_path = os.path.dirname(model_path)
         if dir_path:
             os.makedirs(dir_path, exist_ok=True)
         joblib.dump(model, model_path)
@@ -157,8 +169,6 @@ def log_file_size(path: str, label: str = "File") -> None:
         raise AITextException(e)
 
 
-
-
 def read_numpy(path: str) -> np.ndarray:
     try:
         if not path.endswith(".npy"):
@@ -169,9 +179,9 @@ def read_numpy(path: str) -> np.ndarray:
         raise AITextException(e)
 
 
-def save_numpy(array: np.ndarray, path: str ) -> None:
+def save_numpy(array: np.ndarray, path: str) -> None:
     try:
-        dir_path=os.path.dirname(path)
+        dir_path = os.path.dirname(path)
         if dir_path:
             os.makedirs(dir_path, exist_ok=True)
         np.save(path, array)
@@ -180,6 +190,7 @@ def save_numpy(array: np.ndarray, path: str ) -> None:
     except Exception as e:
         logger.error(f"Failed to save numpy array at {path}")
         raise AITextException(e)
+
 
 def extract_params(source: dict, keys: list[str]) -> dict:
     clean = {}
@@ -190,7 +201,7 @@ def extract_params(source: dict, keys: list[str]) -> dict:
         else:
             clean[k] = float(v)
     return clean
-from box import ConfigBox
+
 
 def to_dict(obj):
     """

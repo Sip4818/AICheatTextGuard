@@ -5,34 +5,34 @@ stages:
     deps:
     - path: config/config.yaml
       hash: md5
-      md5: b0d1037019ee54918bb27fcee92fbd20
-      size: 2615
+      md5: d0f474170bb67445d6c0ad3836bcb2be
+      size: 2613
     - path: src/components/data_ingestion.py
       hash: md5
-      md5: 7d55e9fef516c8dd55f33cc8b62b008a
-      size: 2231
+      md5: bcf2f3fe5c2deeffd393594237242099
+      size: 2516
     - path: src/pipeline/training/ingest_data.py
       hash: md5
-      md5: d932f6d948e6a166b79d18f41a3d0877
-      size: 217
+      md5: e91b7a152acc38b04da3178d9a2b6460
+      size: 219
     outs:
     - path: data/raw
       hash: md5
-      md5: a21cb287ed202b67d8818403aec3d7f8.dir
-      size: 628180
-      nfiles: 2
+      md5: 11cff0122a7dfcd3ebf252b6dd51ed89.dir
+      size: 630907
+      nfiles: 3
   validate_data:
     cmd: python -m src.pipeline.training.validate_data
     deps:
     - path: data/raw
       hash: md5
-      md5: a21cb287ed202b67d8818403aec3d7f8.dir
-      size: 628180
-      nfiles: 2
+      md5: 11cff0122a7dfcd3ebf252b6dd51ed89.dir
+      size: 630907
+      nfiles: 3
     - path: src/components/data_validation.py
       hash: md5
-      md5: 1daf4e457c2c6a422d7d5b06db5c7f31
-      size: 3949
+      md5: 44397a01543593bb9be821ac0fedd07a
+      size: 3882
     - path: src/pipeline/training/validate_data.py
       hash: md5
       md5: 9a14d8b5be7ffc0291541a0ef8043d76
@@ -48,13 +48,13 @@ stages:
     deps:
     - path: data/raw
       hash: md5
-      md5: a21cb287ed202b67d8818403aec3d7f8.dir
-      size: 628180
-      nfiles: 2
+      md5: 11cff0122a7dfcd3ebf252b6dd51ed89.dir
+      size: 630907
+      nfiles: 3
     - path: src/components/data_transformation.py
       hash: md5
-      md5: 7e587d09dc10d054c1dee44cd1b434fc
-      size: 3789
+      md5: fd353a83e69d62fbd144150bbdf1c447
+      size: 3032
     - path: src/pipeline/training/transform_data.py
       hash: md5
       md5: 4fca99400e6588494f5f7b09c0257317
@@ -62,33 +62,54 @@ stages:
     outs:
     - path: artifact/data_transformation
       hash: md5
-      md5: 9f87fe476778f4ae5186a1db73281500.dir
-      size: 91396342
+      md5: 7b53a078347e4303f6fde11637250fbd.dir
+      size: 91396183
       nfiles: 1
     - path: data/transformed
       hash: md5
-      md5: ef657e24f430594a16ec1e03681aeb09.dir
-      size: 4995680
-      nfiles: 3
+      md5: 560d221d6642f4855589897a260fc200.dir
+      size: 2015968
+      nfiles: 1
   model_trainer:
     cmd: python -m src.pipeline.training.model_trainer
     deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: d0f474170bb67445d6c0ad3836bcb2be
+      size: 2613
     - path: data/transformed
       hash: md5
-      md5: ef657e24f430594a16ec1e03681aeb09.dir
-      size: 4995680
-      nfiles: 3
+      md5: 560d221d6642f4855589897a260fc200.dir
+      size: 2015968
+      nfiles: 1
     - path: src/components/model_trainer.py
       hash: md5
-      md5: 4d603bf19977091aeca59d9415162dbb
-      size: 8831
+      md5: fc5f25c750ab49db72477dec5d3bb202
+      size: 9768
     - path: src/pipeline/training/model_trainer.py
       hash: md5
-      md5: 67287f511e5ebd72c1efe3374d82a952
-      size: 175
+      md5: ce1775d1e7b1f946ab6275f0f424a4f8
+      size: 173
     outs:
     - path: artifact/model_trainer
       hash: md5
-      md5: a12f5fa6878bd34e379fcf6d293be4a5.dir
-      size: 443170
+      md5: 3bd130d4274e44dfe6768abf6c681bfa.dir
+      size: 606151
       nfiles: 5
+  model_evaluation:
+    cmd: python -m src.pipeline.training.model_evalute
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: d0f474170bb67445d6c0ad3836bcb2be
+      size: 2613
+    - path: src/components/model_evaluation.py
+      hash: md5
+      md5: 3eccbf4d2515c47da18a80318c0764b7
+      size: 1571
+    outs:
+    - path: artifact/model_evaluation
+      hash: md5
+      md5: 93c3a697b6ae9ad11015fe631d1107a6.dir
+      size: 56
+      nfiles: 1

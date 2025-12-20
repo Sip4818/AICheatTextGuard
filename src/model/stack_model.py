@@ -1,4 +1,6 @@
 import numpy as np
+
+
 class StackedModel:
     def __init__(self, preprocessor, lr_model, xgb_model, meta_model):
         self.preprocessor = preprocessor
