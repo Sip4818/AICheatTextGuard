@@ -93,9 +93,14 @@ stages:
     outs:
     - path: artifact/model_trainer
       hash: md5
-      md5: 3bd130d4274e44dfe6768abf6c681bfa.dir
+      md5: 391bcd12cd6690f6ff9ffa2dc42ebdea.dir
       size: 606151
       nfiles: 5
+    - path: model/
+      hash: md5
+      md5: 9d5ac80af0c60465f26701eac201abb8.dir
+      size: 91999809
+      nfiles: 1
   model_evaluation:
     cmd: python -m src.pipeline.training.model_evalute
     deps:

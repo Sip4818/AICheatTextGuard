@@ -8,8 +8,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 # Download NLTK data to a specific folder in the builder
-RUN python -m pip install nltk && \
+RUN PYTHONPATH=/install/lib/python3.11/site-packages \
     python -m nltk.downloader -d /install/nltk_data stopwords punkt
+
 
 # STAGE 2: Runner
 FROM python:3.11-slim-bookworm

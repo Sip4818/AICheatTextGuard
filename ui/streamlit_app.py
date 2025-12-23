@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-API_URL = "http://127.0.0.1:8000/predict"
+API_URL = "http://backend:8080/predict"
 
 st.set_page_config(page_title="AI Cheat Text Guard", layout="centered")
 

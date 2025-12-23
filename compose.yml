@@ -1,0 +1,16 @@
+name: AiTextGuard
+services:
+  backend:
+    build: .
+    container_name: Ai-Text-Guard-backend
+    ports:
+      - "8080:8080"
+  
+  ui:
+    build: ./ui
+    container_name: Ai-Text-Guard-ui
+    ports:
+      - "8501:8501"
+    depends_on:
+      - backend
+
