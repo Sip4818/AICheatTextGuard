@@ -1,13 +1,15 @@
 name: AiTextGuard
 services:
   backend:
-    build: .
+    # build: .
+    image: sahil4818/aichettextguard-backend:latest
     container_name: Ai-Text-Guard-backend
     ports:
       - "8080:8080"
   
   ui:
-    build: ./ui
+    # build: ./ui
+    image: sahil4818/aichettextguard-ui:latest
     container_name: Ai-Text-Guard-ui
     ports:
       - "8501:8501"

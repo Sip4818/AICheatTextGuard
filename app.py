@@ -5,6 +5,8 @@ from fastapi import FastAPI
 from src.pipeline.prediction.prediction_pipeline import PredictionPipeline
 from src.utils.common import download_from_gcs
 from src.constants.constants import final_model_path, bucket_name
+from dotenv import load_dotenv
+load_dotenv()
 
 app = FastAPI()
 
