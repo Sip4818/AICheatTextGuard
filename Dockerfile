@@ -29,7 +29,6 @@ ENV CUDA_VISIBLE_DEVICES=-1
 
 # Copy your app code
 COPY app.py .
-COPY model ./model
 COPY src ./src
 
 # Clean up

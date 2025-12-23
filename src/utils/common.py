@@ -76,6 +76,54 @@ def create_dir(path: str, name: str) -> None:
         raise AITextException(e)
 
 
+def upload_to_gcs(
+    bucket_name: str,
+    source_path: str,
+    destination_path: str,
+    overwrite: bool = True,
+) -> None:
+    """
+    Upload a local file to Google Cloud Storage.
+
+    Args:
+        bucket_name (str): Name of the GCS bucket
+        source_path (str): Local file path to upload
+        destination_path (str): GCS object path (inside bucket)
+        overwrite (bool): Whether to overwrite if object already exists
+
+    Raises:
+        AITextException: If upload fails
+    """
+    try:
+        if not os.path.exists(source_path):
+            raise FileNotFoundError(f"Source file not found: {source_path}")
+
+        client = storage.Client()
+        bucket = client.bucket(bucket_name)
+        blob = bucket.blob(destination_path)
+
+        if blob.exists() and not overwrite:
+            logger.info(
+                f"GCS object already exists, skipping upload: "
+                f"gs://{bucket_name}/{destination_path}"
+            )
+            return
+
+        logger.info(
+            f"Uploading file to GCS: "
+            f"{source_path} → gs://{bucket_name}/{destination_path}"
+        )
+
+        blob.upload_from_filename(source_path)
+
+        logger.info(
+            f"Upload completed: gs://{bucket_name}/{destination_path}"
+        )
+
+    except Exception as e:
+        logger.error("Failed to upload file to GCS")
+        raise AITextException(e)
+    
 def download_from_gcs(bucket_name: str, source_path: str, local_path: str) -> None:
     """Downloads a blob from GCS to local."""
     try:

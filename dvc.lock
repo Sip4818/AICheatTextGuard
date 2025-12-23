@@ -5,8 +5,8 @@ stages:
     deps:
     - path: config/config.yaml
       hash: md5
-      md5: d0f474170bb67445d6c0ad3836bcb2be
-      size: 2613
+      md5: 34d50c4c67bc4b1505c2c2e96298dc8e
+      size: 2642
     - path: src/components/data_ingestion.py
       hash: md5
       md5: bcf2f3fe5c2deeffd393594237242099
@@ -75,8 +75,8 @@ stages:
     deps:
     - path: config/config.yaml
       hash: md5
-      md5: d0f474170bb67445d6c0ad3836bcb2be
-      size: 2613
+      md5: 34d50c4c67bc4b1505c2c2e96298dc8e
+      size: 2642
     - path: data/transformed
       hash: md5
       md5: 560d221d6642f4855589897a260fc200.dir
@@ -93,12 +93,12 @@ stages:
     outs:
     - path: artifact/model_trainer
       hash: md5
-      md5: 391bcd12cd6690f6ff9ffa2dc42ebdea.dir
+      md5: f22843fa61ca1faabd765ad8acaee4e7.dir
       size: 606151
       nfiles: 5
     - path: model/
       hash: md5
-      md5: 9d5ac80af0c60465f26701eac201abb8.dir
+      md5: 8ad1307acfe24bb872e6bd9132dda2bb.dir
       size: 91999809
       nfiles: 1
   model_evaluation:
@@ -106,12 +106,12 @@ stages:
     deps:
     - path: config/config.yaml
       hash: md5
-      md5: d0f474170bb67445d6c0ad3836bcb2be
-      size: 2613
+      md5: 34d50c4c67bc4b1505c2c2e96298dc8e
+      size: 2642
     - path: src/components/model_evaluation.py
       hash: md5
-      md5: 3eccbf4d2515c47da18a80318c0764b7
-      size: 1571
+      md5: efa2322a5b0f6fadef5006f3e1a635f1
+      size: 1959
     outs:
     - path: artifact/model_evaluation
       hash: md5

@@ -1,5 +1,4 @@
-from os import write
-from src.utils.common import read_object, read_csv_file
+from src.utils.common import read_object, read_csv_file, upload_to_gcs
 from src.utils.exception import AITextException
 from src.utils.logger import logger
 from src.entity.config_entity import ModelEvaluationConfig
@@ -7,6 +6,8 @@ from sklearn.metrics import roc_auc_score
 import pandas as pd
 import json
 from typing import Any
+from dotenv import load_dotenv
+load_dotenv()
 
 class ModelEvaluation:
     def __init__(self, cfg: ModelEvaluationConfig):
@@ -20,6 +21,15 @@ class ModelEvaluation:
         y = df[self.cfg.target_column_name]
         return X, y
 
+
+    def push_model_to_gcs(self):
+
+        upload_to_gcs(
+            bucket_name=self.cfg.gcs_bucket_name,
+            source_path=self.cfg.final_model_path,
+            destination_path=self.cfg.final_model_path,
+            overwrite=True,
+        )
     def initiate_model_evaluation(self):
         try:
             logger.info("Starting model evaluation")
@@ -35,8 +45,9 @@ class ModelEvaluation:
             content=f"Final ROC AUC Score of the model is {score}"
             self._write_report(self.cfg.model_evaluation_artifact_file_path, content=content)
 
+            if self.cfg.push_model_to_gcs:
+                self.push_model_to_gcs()
             logger.info(f"Final ROC AUC Score of the model is {score}")
-            logger.info("model evaluation stage complete")
         except Exception as e:
             logger.error("Couldn't evaluate the final model")
             raise AITextException(e)

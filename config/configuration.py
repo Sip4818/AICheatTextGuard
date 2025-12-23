@@ -207,7 +207,9 @@ class ConfigurationManager:
                 final_model_path=self.model_trainer_cfg.final_model_path,
                 target_column_name=self.schema.target_column_name,
                 model_evaluation_artifact_file_path= self.model_evaluation_cfg.model_evaluation_file_path,
-                metrices=self.model_evaluation_cfg.metrices
+                metrices=self.model_evaluation_cfg.metrices,
+                push_model_to_gcs=self.model_evaluation_cfg.push_model_to_gcs,
+                gcs_bucket_name= self.data_ingestion_cfg.bucket_name
             )
         except Exception as e:
             logger.error("Failed to build model evaluation config")
