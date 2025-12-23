@@ -15,7 +15,7 @@ test_file_name = "train.csv"
 train_file_name = "test.csv"
 
 # Validation
-
+logs_file_dir="logs"
 
 LR_KEYS = ["C", "penalty", "solver", "max_iter"]
 

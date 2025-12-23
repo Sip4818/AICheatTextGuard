@@ -1,14 +1,12 @@
 import logging
 import os
 from datetime import datetime
-
+from src.constants.constants import logs_file_dir
 # Setup Log Directory
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-LOG_FILE_DIR = os.path.join(BASE_DIR, "logs")
-os.makedirs(LOG_FILE_DIR, exist_ok=True)
+os.makedirs(logs_file_dir, exist_ok=True)
 
 LOG_FILE_NAME = f"{datetime.now().strftime('%m_%d_%Y_%H_%M_%S')}.log"
-LOG_FILE_PATH = os.path.join(LOG_FILE_DIR, LOG_FILE_NAME)
+LOG_FILE_PATH = os.path.join(logs_file_dir, LOG_FILE_NAME)
 
 # Logger Setup
 logger = logging.getLogger("aitextguard")
@@ -33,3 +31,12 @@ console_handler.setFormatter(formatter)
 # Add Handlers
 logger.addHandler(file_handler)
 logger.addHandler(console_handler)
+
+
+if __name__ == "__main__":
+    logger.info("Logger test started")
+    logger.warning("This is a warning log")
+    logger.error("This is an error log")
+
+    print("Log file should be created at:")
+    print(LOG_FILE_PATH)
