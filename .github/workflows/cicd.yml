@@ -12,6 +12,20 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    # --- 1. AUTHENTICATE WITH GOOGLE CLOUD ---
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+    # --- 2. DOWNLOAD MODEL (Bake it into the runner temporarily) ---
+ # --- 2. DOWNLOAD MODEL (Bake it into the runner temporarily) ---
+    - name: Download Model from GCS
+      run: |
+        mkdir -p model
+      
+        gsutil cp gs://ai_text_guard_bucket/model/stacked_model.pkl ./model/
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
@@ -21,22 +35,23 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    # -------- Backend image --------
+    # --- 3. BUILD & PUSH BACKEND (With Model) ---
     - name: Build & push backend image
       uses: docker/build-push-action@v6
       with:
         context: .
-        file: Dockerfile
+        
+        file: Docker/Dockerfile.backend_dockerhub 
         push: true
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/aichettextguard-backend:latest
 
-    # -------- UI image --------
+    # --- 4. BUILD & PUSH UI ---
     - name: Build & push UI image
       uses: docker/build-push-action@v6
       with:
-        context: ./ui
-        file: ./ui/Dockerfile
+        context: .
+        file: Docker/Dockerfile.ui_dockerhub 
         push: true
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/aichettextguard-ui:latest

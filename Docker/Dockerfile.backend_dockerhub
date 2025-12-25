@@ -30,6 +30,7 @@ ENV CUDA_VISIBLE_DEVICES=-1
 # Copy your app code
 COPY app.py .
 COPY src ./src
+COPY model ./model
 
 # Clean up
 RUN find /usr/local -name "*.pyc" -delete && \

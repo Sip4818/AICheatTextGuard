@@ -1,0 +1,22 @@
+# Ignore Git metadata
+.git
+.gitignore
+
+# Ignore Python cache and environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+venv/
+.pytest_cache/
+
+# Ignore local model files IF you only want the CI version
+# However, if you want your local build to work too, DON'T ignore 'model/'
+# model/ 
+
+# Ignore the Docker folder itself (the instructions are already being read)
+Docker/
+
+# Ignore CI/CD configuration
+.github/
