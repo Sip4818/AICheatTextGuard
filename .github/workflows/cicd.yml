@@ -92,7 +92,7 @@ jobs:
         git init
         git checkout -b main
 
-        
+
         # 1. Create the 'Rules' file from scratch on the runner
         git lfs install
         echo "model/stacked_model.pkl filter=lfs diff=lfs merge=lfs -text" > .gitattributes
@@ -105,7 +105,17 @@ jobs:
         # This will now respect the .gitattributes we just created
         # 2. SURGICAL FORCE: Only force the model
         git add -f model/stacked_model.pkl
-            
+        
+
+        # Add metadata to README if it doesn't have it
+        echo "---
+            title: Ai Text Guard
+            emoji: 🛡️
+            colorFrom: blue
+            colorTo: green
+            sdk: docker
+            pinned: false
+            ---" > README.md
         # 3. NORMAL ADD: Add everything else (Respects .gitignore for pycache!)
         git add .        
           # 4. Commit and Push
