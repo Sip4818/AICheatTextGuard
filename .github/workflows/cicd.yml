@@ -88,27 +88,28 @@ jobs:
         git config --global user.email "sip4818@gmail.com"
         git config --global user.name "Sip4818"
 
-        # 2. Prepare the Dockerfile
-        cp Docker/Dockerfile.monolithic Dockerfile
-        
-        # 3. SECURITY & CLEANUP
-        rm -f gha-creds-*.json
-        # Remove the model from Git's memory so we can re-add it with LFS correctly
-        git rm -r --cached model/ || echo "Model not in index yet"
-
-        # 4. Setup LFS Fresh
+        # 2. Setup LFS FIRST (Before touching the index)
         git lfs install
         git lfs track "model/stacked_model.pkl"
         git add .gitattributes
+        
+        # 3. Clean up credentials and Dockerfile
+        rm -f gha-creds-*.json
+        cp Docker/Dockerfile.monolithic Dockerfile
 
-        # 5. Add EVERYTHING
+        # 4. FORCE Git to see the model through LFS
+        # This clears any "normal file" memory Git has of the model
+        git rm -rf --cached model/ || echo "Already clean"
+        
+        # 5. Now add everything else
         git add .
         
         # 6. Commit
-        git commit -m "Deploy monolith with LFS fix [skip ci]" || echo "No changes"
+        git commit -m "Deploy monolith with verified LFS [skip ci]" || echo "No changes"
 
         # 7. Push to Hugging Face
-        # We use a new remote name to avoid the "No such remote" error
         git remote add hf-deploy https://Sahil4818:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/Sahil4818/ai-text-guard || git remote set-url hf-deploy https://Sahil4818:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/Sahil4818/ai-text-guard
         
+        # We add 'git lfs push' to be absolutely sure the heavy lifting happens
+        git lfs push hf-deploy main
         git push --force hf-deploy main
