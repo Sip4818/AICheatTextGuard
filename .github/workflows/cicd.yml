@@ -19,12 +19,16 @@ jobs:
         credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
 
-    - name: 'Upload/Download File'
-      uses: 'google-github-actions/download-cloud-storage@v2'
-      with:
-        bucket: 'ai_text_guard_bucket'
-        object_locations: 'model/stacked_model.pkl'
-        destination: 'model/'
+    - name: 'Download Model'
+      run: |
+        # This confirms the identity and project for the logs
+        gcloud auth list
+        
+        # Create the folder
+        mkdir -p model
+        
+        # Copy the file using the authenticated session
+        gsutil cp gs://ai_text_guard_bucket/model/stacked_model.pkl ./model/
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
