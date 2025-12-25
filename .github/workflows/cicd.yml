@@ -20,7 +20,7 @@ jobs:
 
 
     - name: 'Upload/Download File'
-      uses: 'google-github-actions/get-gcs-objects@v2'
+      uses: 'google-github-actions/download-cloud-storage@v2'
       with:
         bucket: 'ai_text_guard_bucket'
         object_locations: 'model/stacked_model.pkl'
