@@ -84,32 +84,27 @@ jobs:
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        # 1. Identity
         git config --global user.email "sip4818@gmail.com"
         git config --global user.name "Sip4818"
 
-        # 2. Setup Dockerfile and Security
+        # 1. Create the 'Rules' file from scratch on the runner
+        git lfs install
+        echo "model/stacked_model.pkl filter=lfs diff=lfs merge=lfs -text" > .gitattributes
+        
+        # 2. Prep the rest of the files
         cp Docker/Dockerfile.monolithic Dockerfile
         rm -f gha-creds-*.json
 
-        # 3. CONFIGURE LFS FIRST (Crucial Step)
-        git lfs install
-        # We write the .gitattributes manually to be 100% sure
-        echo "model/stacked_model.pkl filter=lfs diff=lfs merge=lfs -text" > .gitattributes
-        git add .gitattributes
-        
-        # 4. NOW ADD THE MODEL
-        # This order ensures Git sees the .gitattributes rule BEFORE it looks at the pkl
-        git add model/stacked_model.pkl
-        git add Dockerfile app.py  # Add your other necessary files explicitly or use .
-        
-        # 5. COMMIT
-        # Check the logs after this - it SHOULD show the pkl file being handled
-        git commit -m "Deploy monolith with forced LFS [skip ci]" || echo "No changes"
-
-        # 6. PUSH
-        git remote add hf-deploy https://Sahil4818:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/Sahil4818/ai-text-guard || git remote set-url hf-deploy https://Sahil4818:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/Sahil4818/ai-text-guard
-        
-        # Force LFS to upload the file to the 'warehouse' first
-        git lfs push --all hf-deploy main
-        git push --force hf-deploy main
+        # 3. Force add EVERYTHING (including src/ and the ignored model/)
+        # This will now respect the .gitattributes we just created
+        # 2. SURGICAL FORCE: Only force the model
+        git add -f model/stacked_model.pkl
+            
+        # 3. NORMAL ADD: Add everything else (Respects .gitignore for pycache!)
+        git add .        
+          # 4. Commit and Push
+        git commit -m "Full deploy: Source + Model via LFS [skip ci]" || echo "No changes"
+          
+        git remote add hf-final https://Sahil4818:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/Sahil4818/ai-text-guard || git remote set-url hf-final https://Sahil4818:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/Sahil4818/ai-text-guard
+          
+        git push --force hf-final main
