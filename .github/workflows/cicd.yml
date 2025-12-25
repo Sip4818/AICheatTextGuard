@@ -80,32 +80,35 @@ jobs:
     #     tags: |
     #       ${{ secrets.DOCKERHUB_USERNAME }}/aichettextguard-monolithic:latest
 
-    - name: Setup Git LFS and Push to hf
+    - name: Setup Git LFS and Push
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
         # 1. Identity
         git config --global user.email "sip4818@gmail.com"
         git config --global user.name "Sip4818"
-        
-        # 2. Fix Dockerfile for Hugging Face
-        # HF looks for 'Dockerfile' in the root. This copies yours to the right spot.
+
+        # 2. Prepare the Dockerfile
         cp Docker/Dockerfile.monolithic Dockerfile
         
+        # 3. SECURITY & CLEANUP
         rm -f gha-creds-*.json
+        # Remove the model from Git's memory so we can re-add it with LFS correctly
+        git rm -r --cached model/ || echo "Model not in index yet"
 
-        # 3. Setup LFS (Must happen before 'git add')
+        # 4. Setup LFS Fresh
         git lfs install
-        git lfs track "model/stacked_model.pkl" 
-        
-        # 4. Add EVERYTHING (Code + Model + new Dockerfile + LFS settings)
+        git lfs track "model/stacked_model.pkl"
+        git add .gitattributes
+
+        # 5. Add EVERYTHING
         git add .
         
-        # 5. Commit and Push
-        git commit -m "Deploy full monolith: Code + Model [skip ci]" || echo "No changes to commit"
+        # 6. Commit
+        git commit -m "Deploy monolith with LFS fix [skip ci]" || echo "No changes"
+
+        # 7. Push to Hugging Face
+        # We use a new remote name to avoid the "No such remote" error
+        git remote add hf-deploy https://Sahil4818:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/Sahil4818/ai-text-guard || git remote set-url hf-deploy https://Sahil4818:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/Sahil4818/ai-text-guard
         
-        git remote remove hf || true
-        git remote add hf-space https://Sahil4818:$HF_TOKEN@huggingface.co/spaces/Sahil4818/ai-text-guard
-        
-        # 6. Push to HF
-        git push --force hf-space main
+        git push --force hf-deploy main
