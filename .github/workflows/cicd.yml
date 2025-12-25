@@ -101,7 +101,7 @@ jobs:
         git commit -m "Deploy full monolith: Code + Model [skip ci]" || echo "No changes to commit"
         
         git remote remove hf || true
-        git remote add hf https://Sahil4818:$HF_TOKEN@huggingface.co/spaces/Sahil4818/aichettextguard
+        git remote add hf https://Sahil4818:$HF_TOKEN@huggingface.co/spaces/Sahil4818/ai-text-guard
         
         # 6. Push to HF
         git push --force hf main
