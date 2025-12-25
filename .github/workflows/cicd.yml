@@ -18,12 +18,12 @@ jobs:
       with:
         credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
-    # --- 2. DOWNLOAD MODEL (Bake it into the runner temporarily) ---
- # --- 2. DOWNLOAD MODEL (Bake it into the runner temporarily) ---
+
     - name: 'Upload/Download File'
       uses: 'google-github-actions/get-gcs-objects@v2'
       with:
-        object_locations: 'ai_text_guard_bucket/model/stacked_model.pkl'
+        bucket: 'ai_text_guard_bucket'
+        object_locations: 'model/stacked_model.pkl'
         destination: 'model/'
 
     - name: Set up Docker Buildx
