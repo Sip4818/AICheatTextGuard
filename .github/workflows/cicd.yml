@@ -87,6 +87,12 @@ jobs:
         git config --global user.email "sip4818@gmail.com"
         git config --global user.name "Sip4818"
 
+
+        rm -rf .git
+        git init
+        git checkout -b main
+
+        
         # 1. Create the 'Rules' file from scratch on the runner
         git lfs install
         echo "model/stacked_model.pkl filter=lfs diff=lfs merge=lfs -text" > .gitattributes
