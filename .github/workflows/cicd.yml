@@ -20,11 +20,11 @@ jobs:
 
     # --- 2. DOWNLOAD MODEL (Bake it into the runner temporarily) ---
  # --- 2. DOWNLOAD MODEL (Bake it into the runner temporarily) ---
-    - name: Download Model from GCS
-      run: |
-        mkdir -p model
-      
-        gsutil cp gs://ai_text_guard_bucket/model/stacked_model.pkl ./model/
+    - name: 'Upload/Download File'
+      uses: 'google-github-actions/get-gcs-objects@v2'
+      with:
+        object_locations: 'ai_text_guard_bucket/model/stacked_model.pkl'
+        destination: 'model/'
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
