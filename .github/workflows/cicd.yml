@@ -12,24 +12,25 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # --- 1. AUTHENTICATE WITH GOOGLE CLOUD ---
+# --- 1. AUTHENTICATE WITH GOOGLE CLOUD ---
     - id: 'auth'
       uses: 'google-github-actions/auth@v2'
       with:
         credentials_json: '${{ secrets.GCP_SA_KEY }}'
+        # ADD THIS LINE: It forces the action to create a file on the runner
+        create_credentials_file: true
 
-
+    # --- 2. DOWNLOAD MODEL ---
     - name: 'Download Model'
       run: |
-        # This confirms the identity and project for the logs
+        # Force gsutil to use the file created in the step above
+        export GOOGLE_APPLICATION_CREDENTIALS="${{ steps.auth.outputs.credentials_file_path }}"
+        
+        # Verify it works
         gcloud auth list
         
-        # Create the folder
         mkdir -p model
-        
-        # Copy the file using the authenticated session
         gsutil cp gs://ai_text_guard_bucket/model/stacked_model.pkl ./model/
-
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
