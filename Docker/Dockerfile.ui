@@ -1,7 +1,7 @@
 # STAGE 1: Builder
 FROM python:3.11-slim-bookworm AS builder
 WORKDIR /install
-COPY ui/requirements.txt .
+COPY requirements\requirements_ui.txt .
 # Install to a specific prefix to make copying easier
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
@@ -20,5 +20,8 @@ COPY ui/ .
 RUN find /usr/local -name "*.pyc" -delete && \
     find /usr/local -name "__pycache__" -delete
 
+    
 EXPOSE 8501
+
+ENV BACKEND_URL=http://backend:8080/predict
 CMD ["streamlit", "run", "streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]

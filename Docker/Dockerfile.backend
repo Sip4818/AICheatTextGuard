@@ -2,7 +2,7 @@
 FROM python:3.11-slim-bookworm AS builder
 
 WORKDIR /app
-COPY requirements.txt .
+COPY requirements\requirements_backend.txt .
 
 # Install with --prefix
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
@@ -37,4 +37,5 @@ RUN find /usr/local -name "*.pyc" -delete && \
     find /usr/local -name "__pycache__" -delete
 
 EXPOSE 8080
+
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]

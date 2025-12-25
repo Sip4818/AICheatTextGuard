@@ -1,0 +1,21 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.5.1+cpu
+ipykernel==7.1.0
+pyyaml==6.0.3
+python-box==7.3.2
+google-cloud-storage==3.6.0
+dotenv==0.9.9
+dvc-gs==3.0.2
+pandas==2.3.3
+google-crc32c==1.5.0
+nltk==3.9.2
+sentence-transformers==5.1.2
+xgboost-cpu==3.1.2
+scikit-learn==1.7.2
+optuna==4.6.0
+fastapi==0.124.4
+uvicorn==0.38.0
+pydantic==2.12.4
+docker==7.1.0
+requests==2.32.5
+streamlit==1.52.2

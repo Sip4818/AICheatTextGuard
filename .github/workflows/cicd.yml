@@ -54,7 +54,7 @@ jobs:
       with:
         context: .
         
-        file: Docker/Dockerfile.backend_dockerhub 
+        file: Docker/Dockerfile.backend
         push: true
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/aichettextguard-backend:latest
@@ -64,7 +64,18 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         context: .
-        file: Docker/Dockerfile.ui_dockerhub 
+        file: Docker/Dockerfile.ui 
         push: true
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/aichettextguard-ui:latest
+    # --- 4. BUILD & PUSH monolithic image ---
+    - name: Build & push monolithic image
+      user: docker/build-push-action@v6
+      with:
+        context: .
+        file: Docker/Dockerfile.monolithic
+        push: true
+        tag: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/aichettextguard-monolithic:latest
+
+    
