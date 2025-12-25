@@ -1,7 +1,7 @@
 # STAGE 1: Builder
 FROM python:3.11-slim-bookworm AS builder
 WORKDIR /install
-COPY requirements\requirements_ui.txt .
+COPY requirements\requirements_ui.txt ./requirements.txt
 # Install to a specific prefix to make copying easier
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
