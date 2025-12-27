@@ -41,44 +41,44 @@ jobs:
 
 
 
-    # - name: Set up Docker Buildx
-    #   uses: docker/setup-buildx-action@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
-    # - name: Login to Docker Hub
-    #   uses: docker/login-action@v3
-    #   with:
-    #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-    #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    # # --- 3. BUILD & PUSH BACKEND (With Model) ---
-    # - name: Build & push backend image
-    #   uses: docker/build-push-action@v6
-    #   with:
-    #     context: .
+    # --- 3. BUILD & PUSH BACKEND (With Model) ---
+    - name: Build & push backend image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
         
-    #     file: Docker/Dockerfile.backend
-    #     push: true
-    #     tags: |
-    #       ${{ secrets.DOCKERHUB_USERNAME }}/aichettextguard-backend:latest
+        file: Docker/Dockerfile.backend
+        push: true
+        tags: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/aichettextguard-backend:latest
 
-    # # --- 4. BUILD & PUSH UI ---
-    # - name: Build & push UI image
-    #   uses: docker/build-push-action@v6
-    #   with:
-    #     context: .
-    #     file: Docker/Dockerfile.ui 
-    #     push: true
-    #     tags: |
-    #       ${{ secrets.DOCKERHUB_USERNAME }}/aichettextguard-ui:latest
-    # # --- 4. BUILD & PUSH monolithic image ---
-    # - name: Build & push monolithic image
-    #   uses: docker/build-push-action@v6
-    #   with:
-    #     context: .
-    #     file: Docker/Dockerfile.monolithic
-    #     push: true
-    #     tags: |
-    #       ${{ secrets.DOCKERHUB_USERNAME }}/aichettextguard-monolithic:latest
+    # --- 4. BUILD & PUSH UI ---
+    - name: Build & push UI image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        file: Docker/Dockerfile.ui 
+        push: true
+        tags: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/aichettextguard-ui:latest
+    # --- 4. BUILD & PUSH monolithic image ---
+    - name: Build & push monolithic image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        file: Docker/Dockerfile.monolithic
+        push: true
+        tags: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/aichettextguard-monolithic:latest
 
     - name: Setup Git LFS and Push
       env:
