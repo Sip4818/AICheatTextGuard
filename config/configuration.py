@@ -84,7 +84,8 @@ class ConfigurationManager:
                 local_data_path=self.data_ingestion_cfg.local_data_path,
                 local_train_path=self.data_ingestion_cfg.local_train_path,
                 local_test_path=self.data_ingestion_cfg.local_test_path,
-                test_split_size=self.data_ingestion_cfg.test_split_size
+                test_split_size=self.data_ingestion_cfg.test_split_size,
+                target_column_name=self.schema.target_column_name
             )
         except Exception as e:
             logger.error("Failed to build DataIngestionConfig")

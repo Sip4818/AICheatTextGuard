@@ -26,7 +26,6 @@ from src.constants.constants import (
 
 import os
 import numpy as np
-from box import ConfigBox
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression

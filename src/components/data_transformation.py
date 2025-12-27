@@ -2,7 +2,6 @@ import os
 import numpy as np
 import pandas as pd
 
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import FunctionTransformer
 from sklearn.pipeline import Pipeline
 
@@ -19,7 +18,6 @@ from src.entity.config_entity import DataTransformationConfig
 from src.entity.artifact_entity import DataTransformationArtifact
 from src.feature_generation.basic_features import BasicFeatureGenerator
 from src.feature_generation.transformer_embedding import EmbeddingFeaturesGenerator
-from src.constants.constants import SEED
 
 
 class DataTransformation:

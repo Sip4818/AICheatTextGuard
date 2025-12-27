@@ -1,4 +1,3 @@
-import os
 from src.utils.logger import logger
 from src.entity.config_entity import DataIngestionConfig
 from src.entity.artifact_entity import DataIngestionArtifact
@@ -46,7 +45,7 @@ class DataIngestion:
 
             data = read_csv_file(self.cfg.local_data_path)
             train, test = train_test_split(
-                data, test_size=self.cfg.test_split_size, random_state=SEED
+                data, test_size=self.cfg.test_split_size, random_state=SEED, stratify= data[self.cfg.target_column_name]
             )
 
             save_csv(train, self.cfg.local_train_path)

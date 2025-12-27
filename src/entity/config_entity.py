@@ -10,6 +10,7 @@ class DataIngestionConfig:
     local_train_path: str
     local_test_path: str
     test_split_size: int
+    target_column_name: str
 
 
 @dataclass

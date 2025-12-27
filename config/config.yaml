@@ -27,7 +27,7 @@ model_trainer:
     lr_level_1_path: artifact/model_trainer/lr_level1.pkl
     xgb_level_1_path: artifact/model_trainer/xgb_level1.pkl
     meta_lr_path: artifact/model_trainer/meta_lr.pkl
-    enable_tuning: false
+    enable_tuning: true
     final_model_path: model/stacked_model.pkl
 
     lr_level1_oof_predictions_path: artifact/model_trainer/level1_oof/lr_oof.npy
