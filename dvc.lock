@@ -5,29 +5,40 @@ stages:
     deps:
     - path: config/config.yaml
       hash: md5
-      md5: 7144c157cafb41d28862f9835ae07dba
-      size: 2641
+      md5: 74f715d82ae0daeefd1434b2b43a08b5
+      size: 2720
     - path: src/components/data_ingestion.py
       hash: md5
-      md5: 30b9aa4070a77a8be1867286f8ad3491
-      size: 2550
+      md5: 5027d2e3f6379ba213acf77895e6a147
+      size: 2689
     - path: src/pipeline/training/ingest_data.py
       hash: md5
       md5: e91b7a152acc38b04da3178d9a2b6460
       size: 219
+    params:
+      config/config.yaml:
+        data_ingestion:
+          root_dir: data/raw
+          cloud_data_path: data/raw/train.csv
+          test_split_size: 0.2
+          bucket_name: ai_text_guard_bucket
+          local_data_path: data/raw/data.csv
+          local_train_path: data/raw/train.csv
+          local_test_path: data/raw/test.csv
+          to_download_data: true
     outs:
     - path: data/raw
       hash: md5
-      md5: 2c9b16066f949e6be539903efcb8e73c.dir
-      size: 630907
+      md5: 596e29b706601292c6dbecfe08355d5e.dir
+      size: 203860990
       nfiles: 3
   validate_data:
     cmd: python -m src.pipeline.training.validate_data
     deps:
     - path: data/raw
       hash: md5
-      md5: 2c9b16066f949e6be539903efcb8e73c.dir
-      size: 630907
+      md5: 596e29b706601292c6dbecfe08355d5e.dir
+      size: 203860990
       nfiles: 3
     - path: src/components/data_validation.py
       hash: md5
@@ -40,21 +51,26 @@ stages:
     outs:
     - path: artifact/data_validation
       hash: md5
-      md5: 62ca3e8788b6cef1acca61ec7556d359.dir
-      size: 470
+      md5: 8286e57dc988b2b3ddbafacf3a3c5d0f.dir
+      size: 505
       nfiles: 1
   transform_data:
     cmd: python -m src.pipeline.training.transform_data
     deps:
     - path: data/raw
       hash: md5
-      md5: 2c9b16066f949e6be539903efcb8e73c.dir
-      size: 630907
+      md5: 596e29b706601292c6dbecfe08355d5e.dir
+      size: 203860990
       nfiles: 3
     - path: src/components/data_transformation.py
       hash: md5
-      md5: 34527c7d4f2ea1fa8a386e5d73507260
-      size: 2936
+      md5: df1121fccd1e9ede0d042bd264afc747
+      size: 2980
+    - path: src/feature_generation
+      hash: md5
+      md5: d45bb3df501244bba5313c3b55f09199.dir
+      size: 15852
+      nfiles: 6
     - path: src/pipeline/training/transform_data.py
       hash: md5
       md5: 4fca99400e6588494f5f7b09c0257317
@@ -62,25 +78,25 @@ stages:
     outs:
     - path: artifact/data_transformation
       hash: md5
-      md5: 4f48854d62066d42e876bebd7142d7ba.dir
-      size: 91396183
+      md5: 264b7fac7602daa93d9447a569cb3ea5.dir
+      size: 91410003
       nfiles: 1
     - path: data/transformed
       hash: md5
-      md5: a0d333e42bd07254ffac5331570075aa.dir
-      size: 2015968
+      md5: 401dc42e35a8d6d3815f5a316a442a2e.dir
+      size: 113425168
       nfiles: 1
   model_trainer:
     cmd: python -m src.pipeline.training.model_trainer
     deps:
     - path: config/config.yaml
       hash: md5
-      md5: 7144c157cafb41d28862f9835ae07dba
-      size: 2641
+      md5: 74f715d82ae0daeefd1434b2b43a08b5
+      size: 2720
     - path: data/transformed
       hash: md5
-      md5: a0d333e42bd07254ffac5331570075aa.dir
-      size: 2015968
+      md5: 401dc42e35a8d6d3815f5a316a442a2e.dir
+      size: 113425168
       nfiles: 1
     - path: src/components/model_trainer.py
       hash: md5
@@ -90,31 +106,41 @@ stages:
       hash: md5
       md5: ce1775d1e7b1f946ab6275f0f424a4f8
       size: 173
+    - path: src/tuning
+      hash: md5
+      md5: 19a9abe95622704287f5242e85296279.dir
+      size: 13382
+      nfiles: 9
     outs:
     - path: artifact/model_trainer
       hash: md5
-      md5: 19772f9e48300c6ca45af4f326f8198a.dir
-      size: 490413
+      md5: ecf010668e3d5c10a6409930f0e92fd5.dir
+      size: 1480313
       nfiles: 5
     - path: model/
       hash: md5
-      md5: 5e6c01a9b6d8778710199cbf518054b9.dir
-      size: 91883997
+      md5: 7abc115c50796d0f1d271f9653e8abdd.dir
+      size: 92316045
       nfiles: 1
   model_evaluation:
     cmd: python -m src.pipeline.training.model_evalute
     deps:
     - path: config/config.yaml
       hash: md5
-      md5: 7144c157cafb41d28862f9835ae07dba
-      size: 2641
+      md5: 74f715d82ae0daeefd1434b2b43a08b5
+      size: 2720
+    - path: model/
+      hash: md5
+      md5: 7abc115c50796d0f1d271f9653e8abdd.dir
+      size: 92316045
+      nfiles: 1
     - path: src/components/model_evaluation.py
       hash: md5
-      md5: 56feb990f501d45ce9ad3d105b3445d7
-      size: 1899
+      md5: 6f0a5ad5106f9b3226d79474b66f4238
+      size: 1941
     outs:
     - path: artifact/model_evaluation
       hash: md5
-      md5: a4154d1cabf2730ed12fc85ed1fd71e6.dir
-      size: 56
+      md5: 4f38ce8238862b7ab6dda74f55fe130c.dir
+      size: 41
       nfiles: 1

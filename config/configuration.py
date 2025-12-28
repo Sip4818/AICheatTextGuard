@@ -85,7 +85,8 @@ class ConfigurationManager:
                 local_train_path=self.data_ingestion_cfg.local_train_path,
                 local_test_path=self.data_ingestion_cfg.local_test_path,
                 test_split_size=self.data_ingestion_cfg.test_split_size,
-                target_column_name=self.schema.target_column_name
+                target_column_name=self.schema.target_column_name,
+                to_download_data= self.data_ingestion_cfg.to_download_data
             )
         except Exception as e:
             logger.error("Failed to build DataIngestionConfig")
@@ -103,6 +104,7 @@ class ConfigurationManager:
                 required_columns=self.schema.required_columns,
                 columns_dtype=self.schema.columns_dtype,
                 allowed_values=self.schema.allowed_values,
+
             )
         except Exception as e:
             logger.error("Failed to build DataValidationConfig")
@@ -127,6 +129,7 @@ class ConfigurationManager:
                 temp_model_dir=self.data_transformation_cfg.temp_model_dir,
                 target_column_name=self.schema.target_column_name,
                 test_split_size=self.data_transformation_cfg.test_split_size,
+                requred_columns=self.schema.required_columns
             )
         except Exception as e:
             logger.error("Failed to build DataTransformationConfig")

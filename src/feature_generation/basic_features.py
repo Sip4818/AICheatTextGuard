@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 import nltk
 from nltk.data import find
@@ -10,122 +11,70 @@ except LookupError:
     nltk.download("stopwords")
 from nltk.corpus import stopwords
 
-
 class BasicFeatureGenerator(BaseEstimator, TransformerMixin):
     def __init__(self):
-        pass
+        # Load resources once during initialization for speed
+        self.stop_words = set(stopwords.words("english"))
+        self.punctuation_pattern = re.compile(r"[.,!?;:\'\"()\[\]{}\-\—…]")
+        self.number_pattern = re.compile(r"\d+")
+        self.symbol_pattern = re.compile(r"[@#$%^&*+=|\\/<>~_]")
 
     def get_cleaned_string(self, text):
+        if not isinstance(text, str): return ""
         text = text.lower()
-        text = re.sub(r"[^\w\s]", "", text)  # remove punctuation/symbols
-        text = " ".join(text.split())
-        return text
-
-    def get_cleaned_text_for_transformer(self, text):
-        text = " ".join(text.split())
-        text = text.lower()
-        return text
-
-    def add_stopword_counts(self, df):
-        stop_words = set(stopwords.words("english"))  # Loaded once per function call
-
-        def count_stopwords(text):
-            text = " ".join(text.split()).lower()
-            words = text.split()
-            return sum(1 for word in words if word in stop_words)
-
-        df["topic_stopword_count"] = df["topic"].apply(count_stopwords)
-        df["answer_stopword_count"] = df["answer"].apply(count_stopwords)
-        return df
+        text = re.sub(r"[^\w\s]", "", text)
+        return " ".join(text.split())
 
     def get_punctuation_count(self, text):
-        text = " ".join(text.split())
-        count = len(re.findall(r"[.,!?;:\'\"()\[\]{}\-\—…]", text))
-        return count
+        return len(self.punctuation_pattern.findall(text))
 
     def get_avg_word_length(self, text):
-        text = " ".join(text.split())
-        text_clean = re.sub(r"[^\w\s]", "", text).lower()
-        word_list = text_clean.split()
-        if not word_list:
-            return 0.0
-        total_chars = len("".join(word_list))
-        total_words = len(word_list)
-        avg_word_len = total_chars / total_words
-        return avg_word_len
+        words = text.split()
+        if not words: return 0.0
+        return sum(len(word) for word in words) / len(words)
 
     def get_capital_words_count(self, text):
-        text = " ".join(text.split())
-        text = re.sub(r"[^A-Za-z\s]", "", text)
-        text_list = text.split()
-        uppercase_words_count = len([word for word in text_list if word.isupper()])
-        return uppercase_words_count
+        # Optimized: check only words that actually have letters
+        words = text.split()
+        return sum(1 for word in words if word.isupper() and any(c.isalpha() for c in word))
 
-    def get_number_count(self, text):
-        text = " ".join(text.split())
-        number_count = len(re.findall(r"\d+", text))
-        return number_count
-
-    def get_symbols_count(self, text):
-        text = " ".join(text.split())
-        count = len(re.findall(r"[@#$%^&*+=|\\/<>~_]", text))
-        return count
-
-    # characters count function
-    def get_characters_count(self, text):
-        return len(text)
-
-    # Words count
-    def get_words_count(self, text):
-        return len(text.split())
-
-    # Unique words count
-    def get_unique_words_count(self, text):
-        return len(set(text.split()))
+    def get_stopword_count(self, text):
+        words = text.lower().split()
+        return sum(1 for word in words if word in self.stop_words)
 
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
         df = data.copy()
-        df["cleaned_topics"] = df["topic"].apply(self.get_cleaned_string)
-        df["cleaned_answers"] = df["answer"].apply(self.get_cleaned_string)
+        
+        # 1. Rename prompt_name to topic safely
+        if "prompt_name" in df.columns:
+            df.rename(columns={"prompt_name": "topic"}, inplace=True)
+        
+        # Ensure 'text' column exists to avoid errors
+        if "text" not in df.columns:
+            raise KeyError("The input DataFrame must contain a 'text' column.")
 
-        # Stopwords count
-        df = self.add_stopword_counts(df)
+        # 2. Optimized Cleaning (List comprehensions are faster than .apply)
+        # We need these for the Embedding Stage later
+        df["cleaned_topics"] = [self.get_cleaned_string(str(t)) for t in df.get("topic", "")]
+        df["cleaned_text"] = [self.get_cleaned_string(t) for t in df["text"]]
 
-        # Characters count
-        df["topic_character_count"] = df["topic"].apply(self.get_characters_count)
-        df["answer_character_count"] = df["answer"].apply(self.get_characters_count)
-
-        # Words count
-        df["topic_word_count"] = df["topic"].apply(self.get_words_count)
-        df["answer_word_count"] = df["answer"].apply(self.get_words_count)
-
-        # Unique words count
-        df["topic_unique_word_count"] = df["topic"].apply(self.get_unique_words_count)
-        df["answer_unique_word_count"] = df["answer"].apply(self.get_unique_words_count)
-
-        # Punctuation count
-        df["topic_punctuation_count"] = df["topic"].apply(self.get_punctuation_count)
-        df["answer_punctuation_count"] = df["answer"].apply(self.get_punctuation_count)
-
-        # Average word length
-        df["topic_avg_word_length"] = df["topic"].apply(self.get_avg_word_length)
-        df["answer_avg_word_length"] = df["answer"].apply(self.get_avg_word_length)
-
-        # Capital words count
-        df["topic_capital_words_count"] = df["topic"].apply(
-            self.get_capital_words_count
-        )
-        df["answer_capital_words_count"] = df["answer"].apply(
-            self.get_capital_words_count
-        )
-
-        # Number count
-        df["topic_number_count"] = df["topic"].apply(self.get_number_count)
-        df["answer_number_count"] = df["answer"].apply(self.get_number_count)
-
-        # Symbol count
-        df["topic_symbol_count"] = df["topic"].apply(self.get_symbols_count)
-        df["answer_symbol_count"] = df["answer"].apply(self.get_symbols_count)
+        # 3. Vectorized Pandas Operations (Fastest possible)
+        df["text_character_count"] = df["text"].str.len()
+        df["text_word_count"] = df["text"].str.split().str.len()
+        
+        # 4. Optimized Feature Extraction (List comprehensions)
+        # These are much faster than .apply for 44k rows
+        text_list = df["text"].tolist()
+        
+        df["text_stopword_count"] = [self.get_stopword_count(t) for t in text_list]
+        df["text_unique_word_count"] = [len(set(t.split())) for t in text_list]
+        df["text_punctuation_count"] = [self.get_punctuation_count(t) for t in text_list]
+        df["text_avg_word_length"] = [self.get_avg_word_length(t) for t in text_list]
+        df["text_capital_words_count"] = [self.get_capital_words_count(t) for t in text_list]
+        
+        # Regex-based features
+        df["text_number_count"] = [len(self.number_pattern.findall(t)) for t in text_list]
+        df["text_symbol_count"] = [len(self.symbol_pattern.findall(t)) for t in text_list]
 
         return df
 

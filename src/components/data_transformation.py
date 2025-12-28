@@ -25,6 +25,7 @@ class DataTransformation:
         self.cfg = cfg
 
     def split_data(self, df: pd.DataFrame):
+        df =df[self.cfg.target_column_name].copy()
         X = df.drop(columns=[self.cfg.target_column_name])
         y = df[self.cfg.target_column_name]
 
@@ -39,7 +40,7 @@ class DataTransformation:
 
             # Load validated CSVs
             df_train = read_csv_file(self.cfg.validated_data_train_path)
-
+            # df_train = df_train.sample(50)
             # Train/val split
             X, y = self.split_data(df_train)
 

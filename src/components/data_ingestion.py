@@ -13,6 +13,7 @@ from sklearn.model_selection import train_test_split
 from src.constants.constants import SEED
 
 
+
 class DataIngestion:
     def __init__(self, cfg: DataIngestionConfig) -> None:
         self.cfg = cfg
@@ -37,7 +38,9 @@ class DataIngestion:
     def initiate_data_ingestion(self) -> DataIngestionArtifact:
         try:
             logger.info("Initiating data ingestion pipeline")
-            self.download_data()
+            if self.cfg.to_download_data:
+                self.download_data()
+                logger.info("Data download config is set False: Data is not downloaded")
 
             assert_file_exists(self.cfg.local_data_path, "data file")
 

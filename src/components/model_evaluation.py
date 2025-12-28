@@ -36,7 +36,7 @@ class ModelEvaluation:
             model = read_object(self.cfg.final_model_path)
 
             test_data = read_csv_file(self.cfg.raw_test_data_path)
-
+            test_data = test_data.head(10)
             X, y = self._split_data(test_data)
 
             y_pred = model.predict_proba(X)[:, 1]

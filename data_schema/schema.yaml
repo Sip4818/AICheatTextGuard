@@ -1,18 +1,16 @@
 required_columns:
-  - id
-  - topic
-  - answer
-  - is_cheating
+  - prompt_name
+  - text
+  - label
 
   
 columns_dtype:
-  id: object
-  topic: object
-  answer: object
-  is_cheating: int64
+  prompt_name: object
+  text: object
+  label: int64
 
 
 allowed_values:
-  is_cheating: [0,1]
+  label: [0,1]
 
-target_column_name: is_cheating
+target_column_name: label

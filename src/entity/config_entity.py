@@ -11,6 +11,7 @@ class DataIngestionConfig:
     local_test_path: str
     test_split_size: int
     target_column_name: str
+    to_download_data: bool
 
 
 @dataclass
@@ -31,6 +32,7 @@ class DataTransformationConfig:
     temp_model_dir: str
     target_column_name: str
     test_split_size: int
+    requred_columns: list
 
 
 @dataclass
