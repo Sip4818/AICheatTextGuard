@@ -8,15 +8,14 @@ st.set_page_config(page_title="AI Cheat Text Guard", layout="centered")
 
 st.title("🛡️ AI Cheat Text Guard")
 
-id = st.text_input("id")
 topic = st.text_area("topic")
-answer = st.text_area("answer")
+text = st.text_area("text")
 
 if st.button("Predict"):
-    if not topic or not id or not answer:
+    if not topic or not id or not text:
         st.warning("Please fill all fields")
     else:
-        payload = {"id": id, "topic": topic, "answer": answer}
+        payload = {"topic": topic, "answer": text}
 
         with st.spinner("Analyzing..."):
             response = requests.post(API_URL, json=payload)
