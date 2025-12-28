@@ -81,6 +81,7 @@ def upload_to_gcs(
     source_path: str,
     destination_path: str,
     overwrite: bool = True,
+    timeout: int = 600,
 ) -> None:
     """
     Upload a local file to Google Cloud Storage.
@@ -114,7 +115,7 @@ def upload_to_gcs(
             f"{source_path} → gs://{bucket_name}/{destination_path}"
         )
 
-        blob.upload_from_filename(source_path)
+        blob.upload_from_filename(source_path, timeout=timeout)
 
         logger.info(
             f"Upload completed: gs://{bucket_name}/{destination_path}"
