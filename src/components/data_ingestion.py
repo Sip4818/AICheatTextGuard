@@ -40,6 +40,7 @@ class DataIngestion:
             logger.info("Initiating data ingestion pipeline")
             if self.cfg.to_download_data:
                 self.download_data()
+            else:
                 logger.info("Data download config is set False: Data is not downloaded")
 
             assert_file_exists(self.cfg.local_data_path, "data file")
@@ -47,6 +48,7 @@ class DataIngestion:
             log_file_size(self.cfg.local_data_path, "data file")
 
             data = read_csv_file(self.cfg.local_data_path)
+            data = data[self.cfg.required_columns].copy()
             train, test = train_test_split(
                 data, test_size=self.cfg.test_split_size, random_state=SEED, stratify= data[self.cfg.target_column_name]
             )

@@ -22,6 +22,7 @@ class BasicFeatureGenerator(BaseEstimator, TransformerMixin):
     def get_cleaned_string(self, text):
         if not isinstance(text, str): return ""
         text = text.lower()
+        # Removes special characters but keeps alphanumeric and spaces
         text = re.sub(r"[^\w\s]", "", text)
         return " ".join(text.split())
 
@@ -34,7 +35,6 @@ class BasicFeatureGenerator(BaseEstimator, TransformerMixin):
         return sum(len(word) for word in words) / len(words)
 
     def get_capital_words_count(self, text):
-        # Optimized: check only words that actually have letters
         words = text.split()
         return sum(1 for word in words if word.isupper() and any(c.isalpha() for c in word))
 
@@ -42,28 +42,24 @@ class BasicFeatureGenerator(BaseEstimator, TransformerMixin):
         words = text.lower().split()
         return sum(1 for word in words if word in self.stop_words)
 
+    def fit(self, X, y=None):
+        return self
+
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
         df = data.copy()
         
-        # 1. Rename prompt_name to topic safely
-        if "prompt_name" in df.columns:
-            df.rename(columns={"prompt_name": "topic"}, inplace=True)
-        
-        # Ensure 'text' column exists to avoid errors
+        # Safety Check
         if "text" not in df.columns:
             raise KeyError("The input DataFrame must contain a 'text' column.")
 
-        # 2. Optimized Cleaning (List comprehensions are faster than .apply)
-        # We need these for the Embedding Stage later
-        df["cleaned_topics"] = [self.get_cleaned_string(str(t)) for t in df.get("topic", "")]
+        # 1. Generate Cleaned Text (Required for the Embedding Generator stage)
         df["cleaned_text"] = [self.get_cleaned_string(t) for t in df["text"]]
 
-        # 3. Vectorized Pandas Operations (Fastest possible)
+        # 2. Vectorized Pandas Operations for Basic Stats
         df["text_character_count"] = df["text"].str.len()
         df["text_word_count"] = df["text"].str.split().str.len()
         
-        # 4. Optimized Feature Extraction (List comprehensions)
-        # These are much faster than .apply for 44k rows
+        # 3. Optimized Feature Extraction using List Comprehensions
         text_list = df["text"].tolist()
         
         df["text_stopword_count"] = [self.get_stopword_count(t) for t in text_list]
@@ -75,6 +71,10 @@ class BasicFeatureGenerator(BaseEstimator, TransformerMixin):
         # Regex-based features
         df["text_number_count"] = [len(self.number_pattern.findall(t)) for t in text_list]
         df["text_symbol_count"] = [len(self.symbol_pattern.findall(t)) for t in text_list]
+
+        # 4. Final Cleanup: Drop the raw 'text' column. 
+        # We keep 'cleaned_text' because the next step in your Pipeline needs it.
+        df.drop(columns=["text"], inplace=True)
 
         return df
 

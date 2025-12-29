@@ -2,21 +2,20 @@ import streamlit as st
 import requests
 import os
 
-API_URL = os.getenv("BACKEND_URL")
-# API_URL = 'http://127.0.0.1:8000/predict'
+# API_URL = os.getenv("BACKEND_URL")
+API_URL = 'http://127.0.0.1:8080/predict'
 
 st.set_page_config(page_title="AI Cheat Text Guard", layout="centered")
 
 st.title("🛡️ AI Cheat Text Guard")
 
-topic = st.text_area("topic")
 text = st.text_area("text")
 
 if st.button("Predict"):
-    if not topic or not text:
+    if not text:
         st.warning("Please fill all fields")
     else:
-        payload = {"topic": topic, "text": text}
+        payload = {"text": text}
 
         with st.spinner("Analyzing..."):
             response = requests.post(API_URL, json=payload)

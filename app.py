@@ -11,7 +11,6 @@ predictor = PredictionPipeline(final_model_path)
 
 
 class PredictRequest(BaseModel):
-    topic: str
     text: str
 
 
@@ -20,7 +19,6 @@ async def predict(req: PredictRequest):
     df = pd.DataFrame(
         [
             {
-                "topic": req.topic,
                 "text": req.text,
             }
         ]

@@ -1,11 +1,9 @@
 required_columns:
-  - prompt_name
   - text
   - label
 
   
 columns_dtype:
-  prompt_name: object
   text: object
   label: int64
 

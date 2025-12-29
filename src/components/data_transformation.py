@@ -25,7 +25,6 @@ class DataTransformation:
         self.cfg = cfg
 
     def split_data(self, df: pd.DataFrame):
-        df =df[self.cfg.target_column_name].copy()
         X = df.drop(columns=[self.cfg.target_column_name])
         y = df[self.cfg.target_column_name]
 

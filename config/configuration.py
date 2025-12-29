@@ -86,6 +86,7 @@ class ConfigurationManager:
                 local_test_path=self.data_ingestion_cfg.local_test_path,
                 test_split_size=self.data_ingestion_cfg.test_split_size,
                 target_column_name=self.schema.target_column_name,
+                required_columns= self.schema.required_columns,
                 to_download_data= self.data_ingestion_cfg.to_download_data
             )
         except Exception as e:

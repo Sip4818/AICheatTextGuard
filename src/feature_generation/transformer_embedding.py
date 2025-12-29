@@ -1,7 +1,7 @@
 from sentence_transformers import SentenceTransformer
 from sklearn.base import BaseEstimator, TransformerMixin
 import numpy as np
-
+import pandas as pd
 
 class EmbeddingFeaturesGenerator(BaseEstimator, TransformerMixin):
     def __init__(self, model_path, model_name="all-MiniLM-L6-v2"):
@@ -10,37 +10,41 @@ class EmbeddingFeaturesGenerator(BaseEstimator, TransformerMixin):
         self.model = None
 
     def fit(self, X, y=None):
-        # Initializing the model here ensures it only loads during the training/inference start
+        # Loading the model here ensures it only loads when needed
         self.model = SentenceTransformer(self.model_name, cache_folder=self.model_path)
         return self
 
     def transform(self, X):
-        # 1. Encode both columns (Using the new 'text' naming convention)
-        topic_embeddings = self.model.encode(X["cleaned_topics"].tolist(), show_progress_bar=False)
-        text_embeddings = self.model.encode(X["cleaned_text"].tolist(), show_progress_bar=False)
+        # 1. Validation: Ensure we have the cleaned text from the previous stage
+        if "cleaned_text" not in X.columns:
+            raise KeyError("EmbeddingFeaturesGenerator requires 'cleaned_text' column.")
 
-        # 2. Row-wise cosine similarity
-        # We add a small epsilon (1e-8) to avoid division by zero if text is empty
-        dot_product = np.sum(topic_embeddings * text_embeddings, axis=1)
-        norms = np.linalg.norm(topic_embeddings, axis=1) * np.linalg.norm(text_embeddings, axis=1)
-        sim_scores = (dot_product / (norms + 1e-8)).reshape(-1, 1)
+        # 2. Semantic Embedding
+        # We transform the text into a 384-dimensional vector (for MiniLM)
+        # This captures the 'essence' of the writing style.
+        text_embeddings = self.model.encode(
+            X["cleaned_text"].tolist(), 
+            show_progress_bar=False,
+            convert_to_numpy=True
+        )
 
-        # 4. Extract numeric features 
-        # We drop all string/ID columns. errors='ignore' ensures it works in production 
-        # where some columns (like 'id' or 'label') might be missing.
+        # 3. Numeric Feature Extraction
+        # We drop all string columns. 
+        # Only the numerical stats from BasicFeatureGenerator should remain.
         COLS_TO_REMOVE = [
             "id", "topic", "text", "label", 
-            "prompt_name", "source", "RDizzl3_seven",  # Added your forgotten columns
-            "cleaned_text", "cleaned_topics", "answer" # Legacy cleanup
+            "prompt_name", "source", "RDizzl3_seven",  
+            "cleaned_text", "cleaned_topics", "answer"
         ]
         
-        numeric_features = X.drop(columns=COLS_TO_REMOVE, errors='ignore').select_dtypes(include=[np.number]).to_numpy()
+        # Extract numeric stats (character counts, word counts, etc.)
+        numeric_stats = X.drop(columns=COLS_TO_REMOVE, errors='ignore').select_dtypes(include=[np.number]).to_numpy()
 
-        # 5. Concatenate all features: [Stats] + [Similarity] + [Style/Semantic Embeddings]
+        # 4. Concatenate: [Statistical Features] + [Semantic Embeddings]
+        # This gives XGBoost both the 'math' of the text and the 'meaning' of the text.
         final_features = np.column_stack(
             (
-                numeric_features,
-                sim_scores,
+                numeric_stats,
                 text_embeddings,
             )
         )

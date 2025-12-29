@@ -11,6 +11,7 @@ class DataIngestionConfig:
     local_test_path: str
     test_split_size: int
     target_column_name: str
+    required_columns: list[str]
     to_download_data: bool
 
 

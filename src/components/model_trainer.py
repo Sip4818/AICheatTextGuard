@@ -75,11 +75,11 @@ class ModelTrainer:
             )
             assert_file_exists(
                 self.model_trainer_config.xgb_level1_oof_predictions_path,
-                "OOF lr numpy",
+                "OOF xgb numpy",
             )
             log_file_size(
                 self.model_trainer_config.xgb_level1_oof_predictions_path,
-                "OOF lr numpy",
+                "OOF xgb numpy",
             )
 
             overall_oof_auc = roc_auc_score(y, oof_preds_xgb)

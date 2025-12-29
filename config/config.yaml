@@ -67,6 +67,6 @@ model_trainer:
 model_evaluation:
     root_dir: artifact/model_evaluation
     metrices: ['auc_ruc']
-    push_model_to_gcs: true
+    push_model_to_gcs: false
     model_evaluation_file_path: artifact/model_evaluation/model_evaluation.txt
         
