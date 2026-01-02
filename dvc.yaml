@@ -1,35 +1,35 @@
 stages:
-  ingest_data:
-    cmd: python -m src.pipeline.training.ingest_data
-    deps:
-      - src/pipeline/training/ingest_data.py
-      - src/components/data_ingestion.py
-      - config/config.yaml
-    params:
-      - config/config.yaml:
-          - data_ingestion
-    outs:
-      - data/raw
+  # ingest_data:
+  #   cmd: python -m src.pipeline.training.ingest_data
+  #   deps:
+  #     - src/pipeline/training/ingest_data.py
+  #     - src/components/data_ingestion.py
+  #     - config/config.yaml
+  #   params:
+  #     - config/config.yaml:
+  #         - data_ingestion
+  #   outs:
+  #     - data/raw
 
-  validate_data:
-    cmd: python -m src.pipeline.training.validate_data
-    deps:
-      - src/pipeline/training/validate_data.py
-      - src/components/data_validation.py
-      - data/raw
-    outs:
-      - artifact/data_validation
+  # validate_data:
+  #   cmd: python -m src.pipeline.training.validate_data
+  #   deps:
+  #     - src/pipeline/training/validate_data.py
+  #     - src/components/data_validation.py
+  #     - data/raw
+  #   outs:
+  #     - artifact/data_validation
 
-  transform_data:
-    cmd: python -m src.pipeline.training.transform_data
-    deps:
-      - src/pipeline/training/transform_data.py
-      - src/components/data_transformation.py
-      - src/feature_generation
-      - data/raw
-    outs:
-      - data/transformed
-      - artifact/data_transformation
+  # transform_data:
+  #   cmd: python -m src.pipeline.training.transform_data
+  #   deps:
+  #     - src/pipeline/training/transform_data.py
+  #     - src/components/data_transformation.py
+  #     - src/feature_generation
+  #     - data/raw
+  #   outs:
+  #     - data/transformed
+  #     - artifact/data_transformation
 
   model_trainer:
     cmd: python -m src.pipeline.training.model_trainer
@@ -43,12 +43,12 @@ stages:
       - artifact/model_trainer
       - model/
 
-  model_evaluation:
-    cmd: python -m src.pipeline.training.model_evalute
-    deps:
-      - model/
-      - src/components/model_evaluation.py
-      - config/config.yaml
-    outs:
-      - artifact/model_evaluation
+  # model_evaluation:
+  #   cmd: python -m src.pipeline.training.model_evalute
+  #   deps:
+  #     - model/
+  #     - src/components/model_evaluation.py
+  #     - config/config.yaml
+  #   outs:
+  #     - artifact/model_evaluation
       

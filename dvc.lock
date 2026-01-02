@@ -91,8 +91,8 @@ stages:
     deps:
     - path: config/config.yaml
       hash: md5
-      md5: 74f715d82ae0daeefd1434b2b43a08b5
-      size: 2720
+      md5: 4e65c8ca33ed313d0d01d6367f3788d6
+      size: 2717
     - path: data/transformed
       hash: md5
       md5: 2057967c465c7356382384ddeeeec1e0.dir
@@ -108,19 +108,19 @@ stages:
       size: 173
     - path: src/tuning
       hash: md5
-      md5: 19a9abe95622704287f5242e85296279.dir
-      size: 13382
+      md5: b243677e51e39cbcd6789a9dc1469985.dir
+      size: 17978
       nfiles: 9
     outs:
     - path: artifact/model_trainer
       hash: md5
-      md5: 16f679e90b2a365b57904662713a7572.dir
-      size: 1487677
+      md5: f0dfce9d0f7d7e557440da6ab6e8e9d2.dir
+      size: 1259011
       nfiles: 5
     - path: model/
       hash: md5
-      md5: 91180dbca38cab863acd11a67a3bc04a.dir
-      size: 92323853
+      md5: 4d346d84b4b5950876c36e07271c8882.dir
+      size: 92095217
       nfiles: 1
   model_evaluation:
     cmd: python -m src.pipeline.training.model_evalute
