@@ -12,8 +12,9 @@ nltk==3.9.2
 sentence-transformers==5.1.2
 xgboost-cpu==3.1.2
 scikit-learn==1.7.2
-# optuna==4.6.0
+optuna==4.6.0
 fastapi==0.124.4
 uvicorn==0.38.0
 pydantic==2.12.4
+optuna-integration[mlflow]
 # docker==7.1.0

@@ -10,6 +10,7 @@ from src.entity.artifact_entity import (
     DataTransformationArtifact,
     DataValidationArtifact,
     ModelTrainerArtifact,
+    ModelEvaluationArtifact
 )
 from config.configuration import ConfigurationManager
 from config.training_pipeline_config import TrainingPipelineConfig

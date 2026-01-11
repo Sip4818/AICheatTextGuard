@@ -28,7 +28,7 @@ model_trainer:
     lr_level_1_path: artifact/model_trainer/lr_level1.pkl
     xgb_level_1_path: artifact/model_trainer/xgb_level1.pkl
     meta_lr_path: artifact/model_trainer/meta_lr.pkl
-    enable_tuning: true
+    enable_tuning: False
     final_model_path: model/stacked_model.pkl
 
     lr_level1_oof_predictions_path: artifact/model_trainer/level1_oof/lr_oof.npy
@@ -67,6 +67,6 @@ model_trainer:
 model_evaluation:
     root_dir: artifact/model_evaluation
     metrices: ['auc_ruc']
-    push_model_to_gcs: true
+    push_model_to_gcs: False
     model_evaluation_file_path: artifact/model_evaluation/model_evaluation.txt
         
