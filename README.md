@@ -145,3 +145,4 @@ Make sure Docker is installed and running on your system.
 git clone https://github.com/Sip4818/AICheatTextGuard.git
 cd AICheatTextGuard
 docker compose up
+
