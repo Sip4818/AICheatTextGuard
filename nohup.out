@@ -1,0 +1,191 @@
+INFO:     Started server process [2140]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:56634 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56634 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56654 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56634 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56634 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56654 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56646 - "POST /predict HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/connection.py", line 855, in connect_check_health
+    sock = self.retry.call_with_retry(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/retry.py", line 116, in call_with_retry
+    return do()
+           ^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/connection.py", line 856, in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+            ^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/connection.py", line 1306, in _connect
+    raise err
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/connection.py", line 1290, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/uvicorn/protocols/http/h11_impl.py", line 403, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/fastapi/applications.py", line 1139, in __call__
+    await super().__call__(scope, receive, send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/prometheus_fastapi_instrumentator/middleware.py", line 177, in __call__
+    raise exc
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/prometheus_fastapi_instrumentator/middleware.py", line 175, in __call__
+    await self.app(scope, receive, send_wrapper)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/fastapi/routing.py", line 120, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/fastapi/routing.py", line 106, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/fastapi/routing.py", line 430, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/fastapi/routing.py", line 316, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/app.py", line 31, in predict
+    cached_result = r.get(key)
+                    ^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/commands/core.py", line 1923, in get
+    return self.execute_command("GET", name, keys=[name])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/client.py", line 657, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/client.py", line 663, in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/utils.py", line 196, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/connection.py", line 2603, in get_connection
+    connection.connect()
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/connection.py", line 846, in connect
+    self.connect_check_health(check_health=True)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/connection.py", line 863, in connect_check_health
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+INFO:     127.0.0.1:33044 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33054 - "POST /predict HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/connection.py", line 855, in connect_check_health
+    sock = self.retry.call_with_retry(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/retry.py", line 116, in call_with_retry
+    return do()
+           ^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/connection.py", line 856, in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+            ^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/connection.py", line 1306, in _connect
+    raise err
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/connection.py", line 1290, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/uvicorn/protocols/http/h11_impl.py", line 403, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/fastapi/applications.py", line 1139, in __call__
+    await super().__call__(scope, receive, send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/prometheus_fastapi_instrumentator/middleware.py", line 177, in __call__
+    raise exc
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/prometheus_fastapi_instrumentator/middleware.py", line 175, in __call__
+    await self.app(scope, receive, send_wrapper)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/fastapi/routing.py", line 120, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/fastapi/routing.py", line 106, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/fastapi/routing.py", line 430, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/fastapi/routing.py", line 316, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/app.py", line 31, in predict
+    cached_result = r.get(key)
+                    ^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/commands/core.py", line 1923, in get
+    return self.execute_command("GET", name, keys=[name])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/client.py", line 657, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/client.py", line 663, in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/utils.py", line 196, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/connection.py", line 2603, in get_connection
+    connection.connect()
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/connection.py", line 846, in connect
+    self.connect_check_health(check_health=True)
+  File "/mnt/d/datascience/projects/AICheatTextGuard/myvenv/lib/python3.11/site-packages/redis/connection.py", line 863, in connect_check_health
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.

@@ -16,4 +16,7 @@ scikit-learn==1.7.2
 fastapi==0.124.4
 uvicorn==0.38.0
 pydantic==2.12.4
+redis==7.1.0
+asyncio==4.0.0
+prometheus_fastapi_instrumentator==7.1.0
 # docker==7.1.0

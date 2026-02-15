@@ -1,14 +1,17 @@
-name: AiTextGuard
+version: "3.9"
+
 services:
   backend:
-    # build: .
     image: sahil4818/aichettextguard-backend:latest
     container_name: Ai-Text-Guard-backend
     ports:
       - "8080:8080"
-  
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+
   ui:
-    # build: ./ui
     image: sahil4818/aichettextguard-ui:latest
     container_name: Ai-Text-Guard-ui
     ports:
@@ -16,3 +19,16 @@ services:
     depends_on:
       - backend
 
+  redis:
+    image: redis:7
+    container_name: redis-container
+    ports:
+      - "6379:6379"
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml

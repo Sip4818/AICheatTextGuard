@@ -21,7 +21,7 @@ class DataValidation:
         }
 
     def validate_missing_values(self, df: pd.DataFrame) -> dict:
-        # BUG FIX: If text is an empty string "" but not NULL, isnull() misses it.
+        # FIX: If text is an empty string "" but not NULL, isnull() misses it.
         # We check for both NaN and empty whitespace.
         missing_count = df.isnull().sum().to_dict()
         

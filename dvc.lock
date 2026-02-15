@@ -45,8 +45,8 @@ stages:
       nfiles: 3
     - path: src/components/data_validation.py
       hash: md5
-      md5: 9ab5bb22dc6c296293d9378d185de5af
-      size: 5312
+      md5: 08e32f858f14ffaa04f9be37f6234e35
+      size: 5308
       isexec: true
     - path: src/pipeline/training/validate_data.py
       hash: md5

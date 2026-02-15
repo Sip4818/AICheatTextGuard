@@ -70,41 +70,32 @@ jobs:
         push: true
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/aichettextguard-ui:latest
-    # # --- 4. BUILD & PUSH monolithic image ---
-    # - name: Build & push monolithic image
-    #   uses: docker/build-push-action@v6
-    #   with:
-    #     context: .
-    #     file: Docker/Dockerfile.monolithic
-    #     push: true
-    #     tags: |
-    #       ${{ secrets.DOCKERHUB_USERNAME }}/aichettextguard-monolithic:latest
 
-    - name: Setup Git LFS and Push
-      env:
-        HF_TOKEN: ${{ secrets.HF_TOKEN }}
-      run: |
-        # 1. Identity & Fresh Start
-        git config --global user.email "sip4818@gmail.com"
-        git config --global user.name "Sip4818"
-        rm -rf .git
-        git init
-        git checkout -b main
+    # - name: Setup Git LFS and Push for HF
+    #   env:
+    #     HF_TOKEN: ${{ secrets.HF_TOKEN }}
+    #   run: |
+    #     # 1. Identity & Fresh Start
+    #     git config --global user.email "sip4818@gmail.com"
+    #     git config --global user.name "Sip4818"
+    #     rm -rf .git
+    #     git init
+    #     git checkout -b main
 
-        # 2. LFS & Rules
-        git lfs install
-        echo "model/stacked_model.pkl filter=lfs diff=lfs merge=lfs -text" > .gitattributes
+    #     # 2. LFS & Rules
+    #     git lfs install
+    #     echo "model/stacked_model.pkl filter=lfs diff=lfs merge=lfs -text" > .gitattributes
         
-        # 3. File Prep
-        cp Docker/Dockerfile.monolithic Dockerfile
-        rm -f gha-creds-*.json
+    #     # 3. File Prep
+    #     cp Docker/Dockerfile.monolithic Dockerfile
+    #     rm -f gha-creds-*.json
 
-        printf -- "---\ntitle: Ai Text Guard\nemoji: 🛡️\ncolorFrom: blue\ncolorTo: green\nsdk: docker\npinned: false\n---\n" > README.md
-        # 5. Staging (Surgical Force + Normal Add)
-        git add -f model/stacked_model.pkl
-        git add .
+    #     printf -- "---\ntitle: Ai Text Guard\nemoji: 🛡️\ncolorFrom: blue\ncolorTo: green\nsdk: docker\npinned: false\n---\n" > README.md
+    #     # 5. Staging (Surgical Force + Normal Add)
+    #     git add -f model/stacked_model.pkl
+    #     git add .
         
-        # 6. Commit & Push
-        git commit -m "Final Deploy: Fixed README metadata and LFS [skip ci]"
-        git remote add hf-final https://Sahil4818:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/Sahil4818/ai-text-guard
-        git push --force hf-final main
+    #     # 6. Commit & Push
+    #     git commit -m "Final Deploy: Fixed README metadata and LFS [skip ci]"
+    #     git remote add hf-final https://Sahil4818:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/Sahil4818/ai-text-guard
+    #     git push --force hf-final main
