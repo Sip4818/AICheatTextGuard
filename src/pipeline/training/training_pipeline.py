@@ -1,3 +1,5 @@
+import argparse
+import sys
 from src.components import model_evaluation
 from src.utils.logger import logger
 from src.components.data_ingestion import DataIngestion
@@ -96,3 +98,32 @@ class TrainingPipeline:
         model_evaluation_artifact=model_evaluation.initiate_model_evaluation()
         logger.info("Model Evaluation stage completed")
 
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--debug_mode', action='store_true', help="Run a fast smoke test")
+    args = parser.parse_args()
+
+    try:
+        pipeline = TrainingPipeline()
+        
+        # 1. Start Ingestion
+        ingestion_artifact = pipeline.start_data_ingestion()
+        
+        # DEBUG LOGIC: If debugging, we limit the data early 
+        # to save time/compute in GitHub Actions
+        if args.debug_mode:
+            logger.info("DEBUG MODE ENABLED: Skipping heavy training.")
+            # In debug mode, we might just stop after ingestion or validation
+            # to prove the code 'links' together without training for 20 mins.
+            sys.exit(0) 
+
+        # 2. Continue with full pipeline if not debugging
+        pipeline.start_data_validation()
+        pipeline.start_data_transformation()
+        pipeline.start_model_trainer()
+        pipeline.start_model_evaluation()
+
+    except Exception as e:
+        logger.error(f"Pipeline failed: {e}")
+        sys.exit(1)

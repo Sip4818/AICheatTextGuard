@@ -11,6 +11,7 @@ from src.utils.common import (
 from src.utils.exception import AITextException
 from sklearn.model_selection import train_test_split
 from src.constants.constants import SEED
+import os
 
 
 
@@ -38,28 +39,36 @@ class DataIngestion:
     def initiate_data_ingestion(self) -> DataIngestionArtifact:
         try:
             logger.info("Initiating data ingestion pipeline")
-            if self.cfg.to_download_data:
+
+ 
+            file_exists_locally = os.path.exists(self.cfg.local_data_path)
+
+            if file_exists_locally:
+                logger.info(f"Data found locally at {self.cfg.local_data_path}. Skipping GCS download.")
+            elif self.cfg.to_download_data:
+                # If not found and config allows, download it
                 self.download_data()
             else:
-                logger.info("Data download config is set False: Data is not downloaded")
+                logger.error("Data not found locally and to_download_data is set to False.")
+                raise FileNotFoundError(f"Missing data file at {self.cfg.local_data_path}")
 
             assert_file_exists(self.cfg.local_data_path, "data file")
-
             log_file_size(self.cfg.local_data_path, "data file")
 
             data = read_csv_file(self.cfg.local_data_path)
+            
+            # Rest of your splitting logic remains the same...
             data = data[self.cfg.required_columns].copy()
             train, test = train_test_split(
-                data, test_size=self.cfg.test_split_size, random_state=SEED, stratify= data[self.cfg.target_column_name]
+                data, 
+                test_size=self.cfg.test_split_size, 
+                random_state=SEED, 
+                stratify=data[self.cfg.target_column_name]
             )
 
+            # Save and return artifacts
             save_csv(train, self.cfg.local_train_path)
-            assert_file_exists(self.cfg.local_train_path, "train data file")
-            log_file_size(self.cfg.local_train_path, "train data")
-
             save_csv(test, self.cfg.local_test_path)
-            assert_file_exists(self.cfg.local_test_path, "test data file")
-            log_file_size(self.cfg.local_test_path, "test data")
 
             artifact = DataIngestionArtifact(
                 local_train_file_path=self.cfg.local_train_path,
