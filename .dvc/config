@@ -3,3 +3,4 @@
     remote = gcs_remote
 ['remote "gcs_remote"']
     url = gs://ai_text_guard_bucket/.dvc/cache
+    credentialpath = ../credentials/gcs.json

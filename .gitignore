@@ -29,3 +29,4 @@ temp_best_parmas_storage.yaml
 .env
 logs/
 temp/
+/model
