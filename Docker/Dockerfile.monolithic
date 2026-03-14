@@ -1,0 +1,51 @@
+# --- STAGE 1: Backend & Core Builder ---
+FROM python:3.11-slim-bookworm AS backend-builder
+WORKDIR /install
+COPY requirements/requirements_backend.txt ./requirements.txt
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+# Download NLTK data
+RUN PYTHONPATH=/install/lib/python3.11/site-packages \
+    python -m nltk.downloader -d /install/nltk_data stopwords punkt
+
+# --- STAGE 2: UI Builder ---
+FROM python:3.11-slim-bookworm AS ui-builder
+WORKDIR /install
+COPY requirements/requirements_ui.txt ./requirements.txt
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# --- STAGE 3: Final Runner ---
+FROM python:3.11-slim-bookworm
+WORKDIR /app
+
+# 1. Copy Backend packages and NLTK data
+COPY --from=backend-builder /install/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=backend-builder /install/bin /usr/local/bin
+COPY --from=backend-builder /install/nltk_data /usr/share/nltk_data
+
+# 2. Copy UI packages (Merges with existing site-packages)
+COPY --from=ui-builder /install/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=ui-builder /install/bin /usr/local/bin
+
+# 3. Environment Variables
+ENV NLTK_DATA=/usr/share/nltk_data
+ENV CUDA_VISIBLE_DEVICES=-1
+# Hugging Face default port
+ENV PORT=7860 
+
+# 4. Copy Code (Backend and UI)
+COPY app.py .
+COPY src/ ./src/
+COPY model/ ./model/
+COPY ui/ ./ui/
+COPY start.sh .
+
+# 5. Clean up & Permissions
+RUN find /usr/local -name "*.pyc" -delete && \
+    find /usr/local -name "__pycache__" -delete && \
+    chmod +x start.sh
+
+# Hugging Face usually listens on 7860
+EXPOSE 7860
+EXPOSE 8080
+ENV BACKEND_URL=http://127.0.0.1:8080/predict
+CMD ["./start.sh"]

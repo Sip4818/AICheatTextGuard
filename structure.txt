@@ -1,0 +1,78 @@
+.
+├── Docker
+│   ├── Dockerfile.backend
+│   ├── Dockerfile.monolithic
+│   └── Dockerfile.ui
+├── Dockerfile-old
+├── LICENSE
+├── README.md
+├── app.py
+├── compose.yml
+├── config
+│   ├── config.yaml
+│   ├── configuration.py
+│   └── training_pipeline_config.py
+├── credentials
+│   └── gcs.json
+├── data_schema
+│   └── schema.yaml
+├── dvc.lock
+├── dvc.yaml
+├── important_files.txt
+├── main.py
+├── params.yaml
+├── project_structure.py
+├── requirements
+│   ├── requirements_backend.txt
+│   ├── requirements_training.txt
+│   └── requirements_ui.txt
+├── requirements.txt
+├── setup.py
+├── src
+│   ├── __init__.py
+│   ├── components
+│   │   ├── __init__.py
+│   │   ├── data_ingestion.py
+│   │   ├── data_transformation.py
+│   │   ├── data_validation.py
+│   │   ├── model_evaluation.py
+│   │   └── model_trainer.py
+│   ├── constants
+│   │   └── constants.py
+│   ├── entity
+│   │   ├── __init__.py
+│   │   ├── artifact_entity.py
+│   │   ├── config_entity.py
+│   │   ├── model_trainer_final_params_entity.py
+│   │   └── model_trainer_tuning_entity.py
+│   ├── feature_generation
+│   │   ├── __init__.py
+│   │   ├── basic_features.py
+│   │   └── transformer_embedding.py
+│   ├── pipeline
+│   │   ├── __init__.py
+│   │   ├── prediction
+│   │   │   └── prediction_pipeline.py
+│   │   └── training
+│   │       ├── __init__.py
+│   │       ├── ingest_data.py
+│   │       ├── model_evalute.py
+│   │       ├── model_trainer.py
+│   │       ├── training_pipeline.py
+│   │       ├── transform_data.py
+│   │       └── validate_data.py
+│   ├── tuning
+│   │   ├── __init__.py
+│   │   ├── _objective.py
+│   │   ├── _search_spaces.py
+│   │   ├── _utils.py
+│   │   └── tuner.py
+│   └── utils
+│       ├── __init__.py
+│       ├── common.py
+│       ├── exception.py
+│       └── logger.py
+├── start.sh
+└── structure.txt
+
+16 directories, 60 files

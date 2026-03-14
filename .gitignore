@@ -1,0 +1,31 @@
+# Virtual environments
+myvenv/
+venv/
+.venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Data & Models (Specific extensions for safety)
+data/
+model/
+models/
+artifacts/
+*.csv
+*.pkl
+*.joblib
+*.exe
+credentials/
+*.json
+.env
+# ML Tracking & Configs
+mlruns/
+temp_best_parmas_storage.yaml
+
+# OS / editor / credentials
+.DS_Store
+.vscode/
+.env
+logs/
+temp/

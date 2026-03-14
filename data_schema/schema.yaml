@@ -1,0 +1,14 @@
+required_columns:
+  - text
+  - label
+
+  
+columns_dtype:
+  text: object
+  label: int64
+
+
+allowed_values:
+  label: [0,1]
+
+target_column_name: label

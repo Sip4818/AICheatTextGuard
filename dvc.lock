@@ -1,0 +1,158 @@
+schema: '2.0'
+stages:
+  ingest_data:
+    cmd: python -m src.pipeline.training.ingest_data
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 17c8079e2503c81ee1cebd01947e6e5e
+      size: 2719
+      isexec: true
+    - path: src/components/data_ingestion.py
+      hash: md5
+      md5: 75732f6e84ad2cb115a0fb948e351521
+      size: 2767
+      isexec: true
+    - path: src/pipeline/training/ingest_data.py
+      hash: md5
+      md5: 625243b7b01dde352da78687f75debf3
+      size: 212
+      isexec: true
+    params:
+      config/config.yaml:
+        data_ingestion:
+          root_dir: data/raw
+          cloud_data_path: data/raw/train.csv
+          test_split_size: 0.2
+          bucket_name: ai_text_guard_bucket
+          local_data_path: data/raw/data.csv
+          local_train_path: data/raw/train.csv
+          local_test_path: data/raw/test.csv
+          to_download_data: true
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: 92d32619ef63d5cbc83818650ef33a73.dir
+      size: 201775419
+      nfiles: 3
+  validate_data:
+    cmd: python -m src.pipeline.training.validate_data
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: 92d32619ef63d5cbc83818650ef33a73.dir
+      size: 201775419
+      nfiles: 3
+    - path: src/components/data_validation.py
+      hash: md5
+      md5: 08e32f858f14ffaa04f9be37f6234e35
+      size: 5308
+      isexec: true
+    - path: src/pipeline/training/validate_data.py
+      hash: md5
+      md5: 9dcccf48521430597daed6d571957220
+      size: 168
+      isexec: true
+    outs:
+    - path: artifact/data_validation
+      hash: md5
+      md5: 3f7b96c37490f3af34cb01f0d513b57b.dir
+      size: 1188
+      nfiles: 1
+  transform_data:
+    cmd: python -m src.pipeline.training.transform_data
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: 92d32619ef63d5cbc83818650ef33a73.dir
+      size: 201775419
+      nfiles: 3
+    - path: src/components/data_transformation.py
+      hash: md5
+      md5: df1121fccd1e9ede0d042bd264afc747
+      size: 2980
+      isexec: true
+    - path: src/feature_generation
+      hash: md5
+      md5: 8fda53e91bffb4f58738e3e5199f5abf.dir
+      size: 16411
+      nfiles: 6
+    - path: src/pipeline/training/transform_data.py
+      hash: md5
+      md5: ad337fe86d8a766d7f402132dad618ad
+      size: 172
+      isexec: true
+    outs:
+    - path: artifact/data_transformation
+      hash: md5
+      md5: 1f345e70606b516a86e95bb9b3122278.dir
+      size: 91409611
+      nfiles: 1
+    - path: data/transformed
+      hash: md5
+      md5: 0d2751635bc960388ee829a6c7ff850b.dir
+      size: 113138016
+      nfiles: 1
+  model_trainer:
+    cmd: python -m src.pipeline.training.model_trainer
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 17c8079e2503c81ee1cebd01947e6e5e
+      size: 2719
+      isexec: true
+    - path: data/transformed
+      hash: md5
+      md5: 0d2751635bc960388ee829a6c7ff850b.dir
+      size: 113138016
+      nfiles: 1
+    - path: src/components/model_trainer.py
+      hash: md5
+      md5: e3468ef2c5ad918c4c91b7c9c43b81f1
+      size: 9743
+      isexec: true
+    - path: src/pipeline/training/model_trainer.py
+      hash: md5
+      md5: 3014db7a9912a5da8c80a168c1c485ae
+      size: 167
+      isexec: true
+    - path: src/tuning
+      hash: md5
+      md5: 340c980653b74e8d7ecb59bceaa1fd47.dir
+      size: 18013
+      nfiles: 9
+    outs:
+    - path: artifact/model_trainer
+      hash: md5
+      md5: 25b82b42efba2a56969d61d299986212.dir
+      size: 1259256
+      nfiles: 5
+    - path: model/
+      hash: md5
+      md5: 6e38872db5dba19a0b049e86e3a245bd.dir
+      size: 92094417
+      nfiles: 1
+  model_evaluation:
+    cmd: python -m src.pipeline.training.model_evalute
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 17c8079e2503c81ee1cebd01947e6e5e
+      size: 2719
+      isexec: true
+    - path: model/
+      hash: md5
+      md5: 6e38872db5dba19a0b049e86e3a245bd.dir
+      size: 92094417
+      nfiles: 1
+    - path: src/components/model_evaluation.py
+      hash: md5
+      md5: 6f0a5ad5106f9b3226d79474b66f4238
+      size: 1941
+      isexec: true
+    outs:
+    - path: artifact/model_evaluation
+      hash: md5
+      md5: 4f38ce8238862b7ab6dda74f55fe130c.dir
+      size: 41
+      nfiles: 1

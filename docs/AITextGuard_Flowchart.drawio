@@ -1,0 +1,156 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="AITextGuard Pipeline">
+    <mxGraphModel dx="1800" dy="1000" grid="1" gridSize="10" guides="1">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- TITLE -->
+        <mxCell id="title"
+          value="AITextGuard — From Data to Production"
+          style="text;html=1;fontSize=22;fontStyle=1;align=center;"
+          vertex="1" parent="1">
+          <mxGeometry x="400" y="10" width="900" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- DATA SOURCE -->
+        <mxCell id="gcs_data"
+          value="GCS Raw Text Data"
+          style="rounded=1;fillColor=#dae8fc;fontSize=14;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="90" width="220" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- TRAINING PIPELINE -->
+        <mxCell id="train_lane"
+          value="TRAINING PIPELINE (DVC)"
+          style="swimlane;fillColor=#f5f5f5;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="170" width="620" height="560" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ingest" value="Data Ingestion"
+          style="rounded=1;fillColor=#ffffff;"
+          vertex="1" parent="train_lane">
+          <mxGeometry x="40" y="60" width="200" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="validate" value="Schema Validation"
+          style="rounded=1;fillColor=#ffffff;"
+          vertex="1" parent="train_lane">
+          <mxGeometry x="40" y="140" width="200" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="features"
+          value="Feature Engineering&#10;Text Stats + Sentence Transformers"
+          style="rounded=1;fillColor=#ffffff;"
+          vertex="1" parent="train_lane">
+          <mxGeometry x="40" y="230" width="260" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="train_models"
+          value="Base Models&#10;Logistic Regression + XGBoost"
+          style="rounded=1;fillColor=#e1d5e7;"
+          vertex="1" parent="train_lane">
+          <mxGeometry x="340" y="60" width="240" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="stack"
+          value="Stacking Meta Model&#10;Logistic Regression"
+          style="rounded=1;fillColor=#e1d5e7;"
+          vertex="1" parent="train_lane">
+          <mxGeometry x="340" y="150" width="240" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="optuna"
+          value="Hyperparameter Optimization&#10;Optuna"
+          style="rounded=1;fillColor=#fff2cc;"
+          vertex="1" parent="train_lane">
+          <mxGeometry x="340" y="240" width="260" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="mlflow"
+          value="Experiment Tracking&#10;MLflow"
+          style="rounded=1;fillColor=#fff2cc;"
+          vertex="1" parent="train_lane">
+          <mxGeometry x="340" y="330" width="260" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="evaluate"
+          value="Model Evaluation"
+          style="rounded=1;fillColor=#d5e8d4;fontStyle=1;"
+          vertex="1" parent="train_lane">
+          <mxGeometry x="190" y="430" width="260" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- MODEL REGISTRY -->
+        <mxCell id="registry"
+          value="Approved Model Stored in GCS"
+          style="rounded=1;fillColor=#b7e1cd;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="760" y="360" width="280" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- INFERENCE PIPELINE -->
+        <mxCell id="infer_lane"
+          value="INFERENCE PIPELINE"
+          style="swimlane;fillColor=#f8cecc;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="1080" y="170" width="520" height="560" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="api"
+          value="FastAPI Service"
+          style="rounded=1;fillColor=#ffffff;"
+          vertex="1" parent="infer_lane">
+          <mxGeometry x="40" y="80" width="240" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="load_model"
+          value="Load Approved Model from GCS"
+          style="rounded=1;fillColor=#ffffff;"
+          vertex="1" parent="infer_lane">
+          <mxGeometry x="40" y="170" width="260" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="infer_features"
+          value="Feature Pipeline (Same as Training)"
+          style="rounded=1;fillColor=#ffffff;"
+          vertex="1" parent="infer_lane">
+          <mxGeometry x="40" y="260" width="260" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="predict"
+          value="Prediction Output"
+          style="rounded=1;fillColor=#ffffff;"
+          vertex="1" parent="infer_lane">
+          <mxGeometry x="40" y="350" width="240" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="deploy"
+          value="Deployment via Docker and CI/CD to Hugging Face Spaces"
+          style="rounded=1;fillColor=#d5e8d4;fontStyle=1;"
+          vertex="1" parent="infer_lane">
+          <mxGeometry x="40" y="440" width="320" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- ARROWS -->
+        <mxCell id="e1" edge="1" parent="1" source="gcs_data" target="ingest" style="endArrow=block;"/>
+        <mxCell id="e2" edge="1" parent="1" source="ingest" target="validate" style="endArrow=block;"/>
+        <mxCell id="e3" edge="1" parent="1" source="validate" target="features" style="endArrow=block;"/>
+        <mxCell id="e4" edge="1" parent="1" source="features" target="train_models" style="endArrow=block;"/>
+        <mxCell id="e5" edge="1" parent="1" source="train_models" target="stack" style="endArrow=block;"/>
+        <mxCell id="e6" edge="1" parent="1" source="stack" target="optuna" style="endArrow=block;"/>
+        <mxCell id="e7" edge="1" parent="1" source="optuna" target="mlflow" style="endArrow=block;"/>
+        <mxCell id="e8" edge="1" parent="1" source="mlflow" target="evaluate" style="endArrow=block;"/>
+        <mxCell id="e9" edge="1" parent="1" source="evaluate" target="registry" style="endArrow=block;strokeWidth=2;"/>
+        <mxCell id="e10" edge="1" parent="1" source="registry" target="load_model" style="endArrow=block;strokeWidth=2;dashed=1;"/>
+        <mxCell id="e11" edge="1" parent="1" source="api" target="load_model" style="endArrow=block;"/>
+        <mxCell id="e12" edge="1" parent="1" source="load_model" target="infer_features" style="endArrow=block;"/>
+        <mxCell id="e13" edge="1" parent="1" source="infer_features" target="predict" style="endArrow=block;"/>
+        <mxCell id="e14" edge="1" parent="1" source="predict" target="deploy" style="endArrow=block;"/>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
