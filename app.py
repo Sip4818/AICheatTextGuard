@@ -16,7 +16,7 @@ app = FastAPI()
 
 try:
     r = redis.Redis(host='redis', port=6379, decode_responses=True)
-    r.ping()  # Force connection test
+    r.ping()
 except redis.exceptions.RedisError:
     print("Redis not available. Running without cache.")
     r = None

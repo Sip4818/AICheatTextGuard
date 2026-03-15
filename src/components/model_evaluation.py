@@ -2,7 +2,7 @@ from src.utils.common import read_object, read_csv_file, upload_to_gcs
 from src.utils.exception import AITextException
 from src.utils.logger import logger
 from src.entity.config_entity import ModelEvaluationConfig
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, precision_score, recall_score, f1_score, accuracy_score, classification_report
 import pandas as pd
 import json
 from typing import Any
@@ -36,18 +36,37 @@ class ModelEvaluation:
             model = read_object(self.cfg.final_model_path)
 
             test_data = read_csv_file(self.cfg.raw_test_data_path)
-            test_data = test_data.head(10)
             X, y = self._split_data(test_data)
 
-            y_pred = model.predict_proba(X)[:, 1]
+            y_pred_proba = model.predict_proba(X)[:, 1]
+            y_pred_binary = (y_pred_proba >= 0.5).astype(int)
 
-            score = roc_auc_score(y, y_pred)
-            content=f"Final ROC AUC Score of the model is {score}"
+            auc_score = roc_auc_score(y, y_pred_proba)
+            precision = precision_score(y, y_pred_binary)
+            recall = recall_score(y, y_pred_binary)
+            f1 = f1_score(y, y_pred_binary)
+            accuracy = accuracy_score(y, y_pred_binary)
+
+            content = (
+                f"Final Model Evaluation Metrics:\n"
+                f"ROC AUC: {auc_score:.4f}\n"
+                f"Precision: {precision:.4f}\n"
+                f"Recall: {recall:.4f}\n"
+                f"F1 Score: {f1:.4f}\n"
+                f"Accuracy: {accuracy:.4f}"
+)           
+
+            # After getting your predictions (y_pred) and true labels (y_test)
+            report = classification_report(y, y_pred_binary, output_dict=True)
+
+            # Save as JSON for easy reading/tracking
+            with open("artifact/model_evaluation/classification_report.json", "w") as f:
+                json.dump(report, f, indent=4)
             self._write_report(self.cfg.model_evaluation_artifact_file_path, content=content)
+            logger.info(content)
 
             if self.cfg.push_model_to_gcs:
                 self.push_model_to_gcs()
-            logger.info(f"Final ROC AUC Score of the model is {score}")
         except Exception as e:
             logger.error("Couldn't evaluate the final model")
             raise AITextException(e)
