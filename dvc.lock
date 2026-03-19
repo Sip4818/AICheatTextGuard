@@ -5,8 +5,8 @@ stages:
     deps:
     - path: config/config.yaml
       hash: md5
-      md5: 4ce0a60c24201b27b3a792c027be7d6d
-      size: 2675
+      md5: 7f4f18c152e1b144ad93d12f7a8d43ea
+      size: 2716
     - path: src/components/data_ingestion.py
       hash: md5
       md5: 75732f6e84ad2cb115a0fb948e351521
@@ -48,6 +48,12 @@ stages:
       hash: md5
       md5: 9dcccf48521430597daed6d571957220
       size: 168
+    params:
+      config/config.yaml:
+        data_validation:
+          root_dir: artifact/data_validation
+          validated_data_report_file_path: 
+            artifact/data_validation/data_validation_report.txt
     outs:
     - path: artifact/data_validation
       hash: md5
@@ -75,10 +81,20 @@ stages:
       hash: md5
       md5: ad337fe86d8a766d7f402132dad618ad
       size: 172
+    params:
+      config/config.yaml:
+        data_transformation:
+          artifact_root_dir: artifact/data_transformation
+          data_root_dir: data/transformed
+          transformed_train_data_path: data/transformed/train.npy
+          temp_model_dir: temp
+          data_transformation_object_path: 
+            artifact/data_transformation/text_features_preprocessor.pkl
+          test_split_size: 0.2
     outs:
     - path: artifact/data_transformation
       hash: md5
-      md5: 9956c8e32151d905e1ee48560277112b.dir
+      md5: 1cfded404b42bacfcfe21063665a0b46.dir
       size: 91410452
       nfiles: 1
     - path: data/transformed
@@ -91,8 +107,8 @@ stages:
     deps:
     - path: config/config.yaml
       hash: md5
-      md5: 4ce0a60c24201b27b3a792c027be7d6d
-      size: 2675
+      md5: 7f4f18c152e1b144ad93d12f7a8d43ea
+      size: 2716
     - path: data/transformed
       hash: md5
       md5: f2f4b8e029644854868eb83246afb7e5.dir
@@ -111,34 +127,134 @@ stages:
       md5: 93fe845fdc52dec2db257f01eb13e3d8.dir
       size: 23900
       nfiles: 13
+    params:
+      config/config.yaml:
+        model_trainer:
+          root_dir: artifact/model_trainer
+          lr_level_1_path: artifact/model_trainer/lr_level1.pkl
+          xgb_level_1_path: artifact/model_trainer/xgb_level1.pkl
+          meta_lr_path: artifact/model_trainer/meta_lr.pkl
+          enable_tuning: false
+          final_model_path: model/stacked_model.pkl
+          lr_level1_oof_predictions_path: 
+            artifact/model_trainer/level1_oof/lr_oof.npy
+          xgb_level1_oof_predictions_path: 
+            artifact/model_trainer/level1_oof/xgb_oof.npy
+          folds: 5
+          tuning:
+            number_of_trials: 1
+            level1:
+              lr:
+                C:
+                  type: float
+                  low: 0.001
+                  high: 10.0
+                  log: true
+                penalty:
+                - l1
+                - l2
+                solver:
+                - liblinear
+                - saga
+                max_iter:
+                  type: int
+                  low: 300
+                  high: 1000
+              xgb:
+                n_estimators:
+                  type: int
+                  low: 100
+                  high: 700
+                max_depth:
+                  type: int
+                  low: 3
+                  high: 8
+                learning_rate:
+                  type: float
+                  low: 0.005
+                  high: 0.1
+                  log: true
+                subsample:
+                - 0.6
+                - 0.7
+                - 0.8
+                - 1.0
+                colsample_bytree:
+                - 0.5
+                - 0.7
+                - 0.8
+                - 1.0
+                min_child_weight:
+                  type: int
+                  low: 1
+                  high: 7
+                gamma:
+                  type: float
+                  low: 0.001
+                  high: 0.5
+                reg_alpha:
+                  type: float
+                  low: 0.001
+                  high: 1.0
+                  log: true
+                reg_lambda:
+                  type: float
+                  low: 0.1
+                  high: 5.0
+                  log: true
+            level2:
+              lr:
+                C:
+                  type: float
+                  low: 0.001
+                  high: 10.0
+                  log: true
+                penalty:
+                - l2
+                solver:
+                - saga
+                - liblinear
+                max_iter:
+                  type: int
+                  low: 300
+                  high: 1000
     outs:
     - path: artifact/model_trainer
       hash: md5
-      md5: 0e27d977540a579bfb6d127534efa4f2.dir
+      md5: 6f8d9b226af84f2b5bbf6fbf27b9436c.dir
       size: 1259052
       nfiles: 5
     - path: model/
       hash: md5
-      md5: ede6b6645d206a4939b39f48fabd1bf1.dir
+      md5: 20e5a5b86da943d24ada1094f310e37b.dir
       size: 92095041
       nfiles: 1
   model_evaluation:
     cmd: python -m src.pipeline.training.model_evalute
     deps:
-    - path: config/config.yaml
-      hash: md5
-      md5: 4ce0a60c24201b27b3a792c027be7d6d
-      size: 2675
     - path: model/
       hash: md5
-      md5: ede6b6645d206a4939b39f48fabd1bf1.dir
+      md5: 20e5a5b86da943d24ada1094f310e37b.dir
       size: 92095041
       nfiles: 1
     - path: src/components/model_evaluation.py
       hash: md5
-      md5: 819d3977eb9817c7b338168e2bc7f2fc
-      size: 2665
+      md5: f9a69e2d91e47a8c6db89ace8ead2302
+      size: 3041
+    params:
+      config/config.yaml:
+        model_evaluation:
+          root_dir: metrics
+          metrices:
+          - auc_ruc
+          push_model_to_gcs: false
+          model_evaluation_file_path: metrics/metrics.json
+          plot_file_path: metrics/confusion_metrics.png
     outs:
+    - path: metrics/confusion_metrics.png
+      hash: md5
+      md5: b56abd3e5ac95dee89f1451f4959161b
+      size: 50067
     - path: metrics/metrics.json
       hash: md5
       md5: c0d5e43cb89bbdf2673144615ac20fb8

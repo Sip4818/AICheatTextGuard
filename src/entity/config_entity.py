@@ -56,6 +56,7 @@ class ModelEvaluationConfig:
     final_model_path: str
     target_column_name: str
     model_evaluation_artifact_file_path: str
+    plot_file_path: str
     metrices: list[str]
     push_model_to_gcs: bool
     gcs_bucket_name: str

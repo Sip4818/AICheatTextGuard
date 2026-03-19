@@ -4,7 +4,6 @@ stages:
     deps:
     - src/pipeline/training/ingest_data.py
     - src/components/data_ingestion.py
-    - config/config.yaml
     params:
     - config/config.yaml:
       - data_ingestion
@@ -17,6 +16,9 @@ stages:
     - src/pipeline/training/validate_data.py
     - src/components/data_validation.py
     - data/raw
+    params:
+    - config/config.yaml:
+      - data_validation
     outs:
     - artifact/data_validation
 
@@ -27,6 +29,9 @@ stages:
     - src/components/data_transformation.py
     - src/feature_generation
     - data/raw
+    params:
+    - config/config.yaml:
+      - data_transformation
     outs:
     - data/transformed
     - artifact/data_transformation
@@ -34,11 +39,13 @@ stages:
   model_trainer:
     cmd: python -m src.pipeline.training.model_trainer
     deps:
-    - config/config.yaml
     - data/transformed
     - src/components/model_trainer.py
     - src/pipeline/training/model_trainer.py
     - src/tuning
+    params:
+    - config/config.yaml:
+      - model_trainer
     outs:
     - artifact/model_trainer
     - model/
@@ -48,9 +55,14 @@ stages:
     deps:
     - model/
     - src/components/model_evaluation.py
-    - config/config.yaml
-    
+    params:
+    - config/config.yaml:
+      - model_evaluation
+      
     metrics:
       - metrics/metrics.json:
           cache: false
 
+    plots:
+      - metrics/confusion_metrics.png:
+          cache: false
