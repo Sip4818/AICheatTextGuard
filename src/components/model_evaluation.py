@@ -47,23 +47,23 @@ class ModelEvaluation:
             f1 = f1_score(y, y_pred_binary)
             accuracy = accuracy_score(y, y_pred_binary)
 
-            content = (
-                f"Final Model Evaluation Metrics:\n"
-                f"ROC AUC: {auc_score:.4f}\n"
-                f"Precision: {precision:.4f}\n"
-                f"Recall: {recall:.4f}\n"
-                f"F1 Score: {f1:.4f}\n"
-                f"Accuracy: {accuracy:.4f}"
-)           
+            metrics = {
+                "roc_auc": round(auc_score, 4),
+                "precision": round(precision, 4),
+                "recall": round(recall, 4),
+                "f1_score": round(f1, 4),
+                "accuracy": round(accuracy, 4)
+            }
+
 
             # After getting your predictions (y_pred) and true labels (y_test)
             report = classification_report(y, y_pred_binary, output_dict=True)
 
             # Save as JSON for easy reading/tracking
-            with open("artifact/model_evaluation/classification_report.json", "w") as f:
-                json.dump(report, f, indent=4)
-            self._write_report(self.cfg.model_evaluation_artifact_file_path, content=content)
-            logger.info(content)
+
+
+            self._write_report(self.cfg.model_evaluation_artifact_file_path, content=metrics)
+            logger.info(metrics)
 
             if self.cfg.push_model_to_gcs:
                 self.push_model_to_gcs()

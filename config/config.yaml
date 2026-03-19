@@ -66,7 +66,9 @@ model_trainer:
 
 model_evaluation:
     root_dir: artifact/model_evaluation
+    metrics_dir: metrics
     metrices: ['auc_ruc']
     push_model_to_gcs: False
-    model_evaluation_file_path: artifact/model_evaluation/model_evaluation.txt
+    model_evaluation_file_path: artifact/model_evaluation/metrics.json
+    metrics_file_path: metrics.json
         

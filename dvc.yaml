@@ -49,5 +49,8 @@ stages:
     - model/
     - src/components/model_evaluation.py
     - config/config.yaml
-    outs:
-    - artifact/model_evaluation
+    
+    metrics:
+      - artifact/model_evaluation/metrics.json:
+          cache: false
+
