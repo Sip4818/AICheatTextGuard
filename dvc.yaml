@@ -51,6 +51,6 @@ stages:
     - config/config.yaml
     
     metrics:
-      - artifact/model_evaluation/metrics.json:
+      - metrics/metrics.json:
           cache: false
 

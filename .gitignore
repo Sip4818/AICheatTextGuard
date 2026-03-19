@@ -11,8 +11,9 @@ __pycache__/
 data/
 model/
 models/
-artifacts/
-*.csv
+artifact/*
+!artifact/model_evaluation/
+!artifact/model_evaluation/metrics.json*.csv
 *.pkl
 *.joblib
 *.exe
