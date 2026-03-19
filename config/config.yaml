@@ -69,4 +69,4 @@ model_evaluation:
     metrices: ['auc_ruc']
     push_model_to_gcs: False
     model_evaluation_file_path: metrics/metrics.json
-        
+    plot_file_path: metrics/confusion_metrics.png

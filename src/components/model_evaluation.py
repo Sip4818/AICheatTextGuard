@@ -2,7 +2,8 @@ from src.utils.common import read_object, read_csv_file, upload_to_gcs
 from src.utils.exception import AITextException
 from src.utils.logger import logger
 from src.entity.config_entity import ModelEvaluationConfig
-from sklearn.metrics import roc_auc_score, precision_score, recall_score, f1_score, accuracy_score, classification_report
+import matplotlib.pyplot as plt
+from sklearn.metrics import roc_auc_score, precision_score, recall_score, f1_score, accuracy_score, classification_report, confusion_matrix, ConfusionMatrixDisplay
 import pandas as pd
 import json
 from typing import Any
@@ -46,7 +47,14 @@ class ModelEvaluation:
             recall = recall_score(y, y_pred_binary)
             f1 = f1_score(y, y_pred_binary)
             accuracy = accuracy_score(y, y_pred_binary)
+            cm = confusion_matrix(y, y_pred_binary)
+            # plot
+            disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+            disp.plot(cmap="Blues")
 
+            # save
+            plt.savefig(self.cfg.plot_file_path, dpi=300, bbox_inches="tight")
+            plt.close()
             metrics = {
                 "roc_auc": round(auc_score, 4),
                 "precision": round(precision, 4),
@@ -57,7 +65,7 @@ class ModelEvaluation:
 
 
             # After getting your predictions (y_pred) and true labels (y_test)
-            report = classification_report(y, y_pred_binary, output_dict=True)
+            # report = classification_report(y, y_pred_binary, output_dict=True)
 
             # Save as JSON for easy reading/tracking
 

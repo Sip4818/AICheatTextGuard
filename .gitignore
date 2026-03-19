@@ -31,3 +31,5 @@ temp_best_parmas_storage.yaml
 logs/
 temp/
 /model
+*.json
+!metrics/metrics.json
