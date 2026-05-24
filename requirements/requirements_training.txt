@@ -21,3 +21,4 @@ requests==2.32.5
 streamlit==1.52.2
 mlflow
 optuna-integration
+pytest==9.0.1
