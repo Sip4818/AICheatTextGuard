@@ -1,3 +1,4 @@
 
 data/raw/*.csv !text !filter !merge !diff
 model/*.pkl !text !filter !merge !diff
+notebooks/** linguist-vendored
