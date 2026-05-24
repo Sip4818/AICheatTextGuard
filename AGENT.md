@@ -107,6 +107,7 @@ Do not manually edit generated artifacts unless the user explicitly asks. Prefer
 
 ## Coding Guidelines
 
+- Before editing, creating, deleting, formatting, staging, committing, or pushing any file, ask the user for explicit permission. Do not change even a single line without approval.
 - Keep edits scoped to the requested behavior.
 - Preserve existing serialized model contracts unless retraining/regeneration is part of the task.
 - Prefer explicit path/config changes over hardcoded values.
