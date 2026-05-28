@@ -33,7 +33,7 @@ class DataTransformationConfig:
     temp_model_dir: str
     target_column_name: str
     test_split_size: int
-    requred_columns: list
+    required_columns: list
 
 
 @dataclass

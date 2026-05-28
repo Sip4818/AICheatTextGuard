@@ -130,7 +130,7 @@ class ConfigurationManager:
                 temp_model_dir=self.data_transformation_cfg.temp_model_dir,
                 target_column_name=self.schema.target_column_name,
                 test_split_size=self.data_transformation_cfg.test_split_size,
-                requred_columns=self.schema.required_columns
+                required_columns=self.schema.required_columns
             )
         except Exception as e:
             logger.error("Failed to build DataTransformationConfig")

@@ -99,7 +99,7 @@ def test_get_data_transformation_config():
     assert hasattr(data_transformation_config, "temp_model_dir")
     assert hasattr(data_transformation_config, "target_column_name")
     assert hasattr(data_transformation_config, "test_split_size")
-    assert hasattr(data_transformation_config, "requred_columns")
+    assert hasattr(data_transformation_config, "required_columns")
 
     assert isinstance(data_transformation_config.validated_data_train_path, str)
     assert isinstance(data_transformation_config.transformed_train_data_path, str)
@@ -107,10 +107,10 @@ def test_get_data_transformation_config():
     assert isinstance(data_transformation_config.temp_model_dir, str)
     assert isinstance(data_transformation_config.target_column_name, str)
     assert isinstance(data_transformation_config.test_split_size, float)
-    assert isinstance(data_transformation_config.requred_columns, list)
+    assert isinstance(data_transformation_config.required_columns, list)
 
     assert 0 < data_transformation_config.test_split_size < 1
-    assert len(data_transformation_config.requred_columns) > 0
+    assert len(data_transformation_config.required_columns) > 0
 
 
 
