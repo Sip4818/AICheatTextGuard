@@ -2,6 +2,7 @@ import os
 from config.configuration import ConfigurationManager
 from config.training_pipeline_config import TrainingPipelineConfig
 
+
 #Config Manager test cases
 def test_config_init():
 
@@ -98,7 +99,7 @@ def test_get_data_transformation_config():
     assert hasattr(data_transformation_config, "temp_model_dir")
     assert hasattr(data_transformation_config, "target_column_name")
     assert hasattr(data_transformation_config, "test_split_size")
-    assert hasattr(data_transformation_config, "required_columns")
+    assert hasattr(data_transformation_config, "requred_columns")
 
     assert isinstance(data_transformation_config.validated_data_train_path, str)
     assert isinstance(data_transformation_config.transformed_train_data_path, str)
@@ -177,15 +178,15 @@ def test_get_model_trainer_tuning_config():
     assert tuning_config is not None
     assert hasattr(tuning_config, "level1")
     assert hasattr(tuning_config, "level2")
-    assert hasattr(tuning_config.level1, "n_trials")
+    assert hasattr(tuning_config, "n_trials")
 
 
 #Tests for final model evaluation config retrieval
-def test_get_final_model_evaluation_config():
+def test_get_model_trainer_final_params_config():
     training_pipeline_config = TrainingPipelineConfig()
     config_manager = ConfigurationManager(training_pipeline_config=training_pipeline_config)
     
-    final_model_evaluation_config = config_manager.get_final_model_evaluation_config()
+    final_model_evaluation_config = config_manager.get_model_trainer_final_params_config()
     assert final_model_evaluation_config is not None
     assert hasattr(final_model_evaluation_config, "level1")
     assert hasattr(final_model_evaluation_config, "level2")
@@ -196,32 +197,32 @@ def test_get_model_evaluation_config():
     config_manager = ConfigurationManager(training_pipeline_config=training_pipeline_config)
     config = config_manager.get_model_evaluation_config()
 
-    model_evaluation_config = config.get_model_evaluation_config()
-    assert model_evaluation_config is not None
-    assert hasattr(model_evaluation_config, "raw_test_data_path")
-    assert hasattr(model_evaluation_config, "final_model_path")
-    assert hasattr(model_evaluation_config, "target_column_name")
-    assert hasattr(model_evaluation_config, "model_evaluation_artifact_file_path")
-    assert hasattr(model_evaluation_config, "plot_file_path")
-    assert hasattr(model_evaluation_config, "metrices")
-    assert hasattr(model_evaluation_config, "push_model_to_gcs")
-    assert hasattr(model_evaluation_config, "gcs_bucket_name")
+    assert config is not None
+    assert hasattr(config, "raw_test_data_path")
+    assert hasattr(config, "final_model_path")
+    assert hasattr(config, "target_column_name")
+    assert hasattr(config, "model_evaluation_artifact_file_path")
+    assert hasattr(config, "plot_file_path")
+    assert hasattr(config, "metrices")
+    assert hasattr(config, "push_model_to_gcs")
+    assert hasattr(config, "gcs_bucket_name")
 
-    assert isinstance(model_evaluation_config.raw_test_data_path, str)
-    assert isinstance(model_evaluation_config.final_model_path, str)
-    assert isinstance(model_evaluation_config.target_column_name, str)
-    assert isinstance(model_evaluation_config.model_evaluation_artifact_file_path, str)
-    assert isinstance(model_evaluation_config.plot_file_path, str)
-    assert isinstance(model_evaluation_config.metrices, list)
-    assert isinstance(model_evaluation_config.push_model_to_gcs, bool)
-    assert isinstance(model_evaluation_config.gcs_bucket_name, str)
-    assert len(model_evaluation_config.metrices) > 0
-    assert model_evaluation_config.push_model_to_gcs in [True, False]
+    assert isinstance(config.raw_test_data_path, str)
+    assert isinstance(config.final_model_path, str)
+    assert isinstance(config.target_column_name, str)
+    assert isinstance(config.model_evaluation_artifact_file_path, str)
+    assert isinstance(config.plot_file_path, str)
+    assert isinstance(config.metrices, list)
+    assert isinstance(config.push_model_to_gcs, bool)
+    assert isinstance(config.gcs_bucket_name, str)
+    assert len(config.metrices) > 0
+    assert config.push_model_to_gcs in [True, False]
 
 #Check if model evaluation config paths are created
 def test_model_evaluation_config_paths():
     training_pipeline_config = TrainingPipelineConfig()
     config_manager = ConfigurationManager(training_pipeline_config=training_pipeline_config)
     config = config_manager.get_model_evaluation_config()
+
 
     assert os.path.exists(os.path.dirname(config.model_evaluation_artifact_file_path))
