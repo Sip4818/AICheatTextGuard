@@ -1,5 +1,3 @@
-from datetime import datetime
-import os
 from src.constants.constants import data_root, artifacts_root
 
 

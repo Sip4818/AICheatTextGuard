@@ -3,7 +3,7 @@ from ._objective import Objective
 from ._search_spaces import SearchSpaces
 from optuna.integration.mlflow import MLflowCallback
 import mlflow
-import os
+
 
 class Tuner:
     def __init__(self, tuning_cfg, tracking_uri="mlruns"):
@@ -18,14 +18,14 @@ class Tuner:
 
         # 2. Shared search space builder
         self.search_spaces = SearchSpaces(cfg=tuning_cfg)
-        
+
         # 3. Initialize Callback with create_experiment=False
         # This prevents Optuna from fighting your manual mlflow.start_run
         self.mlflc = MLflowCallback(
             tracking_uri=tracking_uri,
             metric_name="AUC Score",
             create_experiment=False,
-            mlflow_kwargs={"nested": True}
+            mlflow_kwargs={"nested": True},
         )
 
     def _setup_mlflow(self):
@@ -43,7 +43,7 @@ class Tuner:
         Tune XGB (Level-1)
         """
         self._setup_mlflow()
-        
+
         objective = Objective(
             model_name="xgb",
             search_spaces=self.search_spaces,
@@ -54,12 +54,12 @@ class Tuner:
 
         with mlflow.start_run(run_name="XGB_Level1_Tuning"):
             study = optuna.create_study(
-                study_name="XGB_Level1_Tuning", 
+                study_name="XGB_Level1_Tuning",
                 direction="maximize",
-                load_if_exists=True
+                load_if_exists=True,
             )
             study.optimize(objective, n_trials=n_trials, callbacks=[self.mlflc])
-            
+
             mlflow.log_params(study.best_params)
             mlflow.log_metric("best_accuracy", study.best_value)
 
@@ -81,12 +81,10 @@ class Tuner:
 
         with mlflow.start_run(run_name="Lr_Level1_Tuning"):
             study = optuna.create_study(
-                study_name="Lr_Level1_Tuning", 
-                direction="maximize",
-                load_if_exists=True
+                study_name="Lr_Level1_Tuning", direction="maximize", load_if_exists=True
             )
             study.optimize(objective, n_trials=n_trials, callbacks=[self.mlflc])
-            
+
             mlflow.log_params(study.best_params)
             mlflow.log_metric("best_accuracy", study.best_value)
 
@@ -111,12 +109,10 @@ class Tuner:
 
         with mlflow.start_run(run_name="lr_Level2_Tuning"):
             study = optuna.create_study(
-                study_name="Lr_Level2_Tuning",
-                direction="maximize",
-                load_if_exists=True
+                study_name="Lr_Level2_Tuning", direction="maximize", load_if_exists=True
             )
             study.optimize(objective, n_trials=n_trials, callbacks=[self.mlflc])
-            
+
             mlflow.log_params(study.best_params)
             mlflow.log_metric("best_accuracy", study.best_value)
 

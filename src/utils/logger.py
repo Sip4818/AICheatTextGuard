@@ -2,6 +2,7 @@ import logging
 import os
 from datetime import datetime
 from src.constants.constants import logs_file_dir
+
 # Setup Log Directory
 os.makedirs(logs_file_dir, exist_ok=True)
 

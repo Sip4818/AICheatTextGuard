@@ -1,11 +1,12 @@
 from src.pipeline.training.training_pipeline import TrainingPipeline
 from dotenv import load_dotenv
 
-load_dotenv()
 from src.utils.logger import logging
 import warnings
 
 warnings.filterwarnings("ignore", category=RuntimeWarning, module="google_crc32c")
+
+load_dotenv()
 
 
 if __name__ == "__main__":

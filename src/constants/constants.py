@@ -1,7 +1,8 @@
+from typing import Any
 # Pipeline config
-data_root = "data"
-artifacts_root = "artifact"
-config_yaml_file_path = "config/config.yaml"
+data_root: str = "data"
+artifacts_root: str = "artifact"
+config_yaml_file_path: str = "config/config.yaml"
 
 SEED = 42
 
@@ -15,7 +16,7 @@ test_file_name = "train.csv"
 train_file_name = "test.csv"
 
 # Validation
-logs_file_dir="logs"
+logs_file_dir = "logs"
 
 LR_KEYS = ["C", "penalty", "solver", "max_iter"]
 
@@ -31,7 +32,7 @@ XGB_KEYS = [
     "reg_lambda",
 ]
 
-params_dict_format = {
+params_dict_format: dict[str,Any] = {
     "model_trainer": {
         "level1": {
             "lr": {
@@ -62,11 +63,11 @@ params_dict_format = {
         },
     }
 }
-validation_report_tempelate = {
-            "schema_check": {},
-            "missing_values_check": {},
-            "allowed_values_check": {},
-            "dtype_check": {},
-        }
+validation_report_tempelate: dict[str, Any] = {
+    "schema_check": {},
+    "missing_values_check": {},
+    "allowed_values_check": {},
+    "dtype_check": {},
+}
 
 final_model_path = "model/stacked_model.pkl"

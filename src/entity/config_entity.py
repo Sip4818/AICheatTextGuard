@@ -60,4 +60,3 @@ class ModelEvaluationConfig:
     metrices: list[str]
     push_model_to_gcs: bool
     gcs_bucket_name: str
-

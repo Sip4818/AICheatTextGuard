@@ -22,6 +22,7 @@ class DataTransformationArtifact:
 class ModelTrainerArtifact:
     model_path: str
 
+
 @dataclass
 class ModelEvaluationArtifact:
     pass

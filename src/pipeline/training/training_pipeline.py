@@ -1,4 +1,3 @@
-from src.components import model_evaluation
 from src.utils.logger import logger
 from src.components.data_ingestion import DataIngestion
 from src.components.data_validation import DataValidation
@@ -10,7 +9,7 @@ from src.entity.artifact_entity import (
     DataTransformationArtifact,
     DataValidationArtifact,
     ModelTrainerArtifact,
-    ModelEvaluationArtifact
+    ModelEvaluationArtifact,
 )
 from config.configuration import ConfigurationManager
 from config.training_pipeline_config import TrainingPipelineConfig
@@ -66,7 +65,7 @@ class TrainingPipeline:
             data_transformation.initiate_data_transformation()
         )
 
-        logger.info(f"Data Transformation stage completed")
+        logger.info("Data Transformation stage completed")
 
         return data_transformation_artifact
 
@@ -87,12 +86,14 @@ class TrainingPipeline:
         logger.info("Model trainer stage completed")
 
         return model_trainer_artifact
-    
+
     def start_model_evaluation(self) -> ModelEvaluationArtifact:
-        logger.info(' model evaluation stage started')
-        model_evaluation_config =self.config_manager.get_model_evaluation_config()
+        logger.info(" model evaluation stage started")
+        model_evaluation_config = self.config_manager.get_model_evaluation_config()
 
-        model_evaluation= ModelEvaluation(model_evaluation_config)
-        model_evaluation_artifact=model_evaluation.initiate_model_evaluation()
+        model_evaluation = ModelEvaluation(model_evaluation_config)
+
+        model_evaluation_artifact = model_evaluation.initiate_model_evaluation()
+
         logger.info("Model Evaluation stage completed")
-
+        return model_evaluation_artifact

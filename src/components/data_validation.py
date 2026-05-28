@@ -1,22 +1,24 @@
 import json
 import pandas as pd
+from typing import Dict, Any
 from src.entity.config_entity import DataValidationConfig
 from src.entity.artifact_entity import DataValidationArtifact
 from src.utils.common import read_csv_file
 from src.utils.logger import logger
 from src.utils.exception import AITextException
 
+
 class DataValidation:
     def __init__(self, cfg: DataValidationConfig) -> None:
         self.cfg = cfg
-        self.report = {}
+        self.report: Dict[str, Any] = {}
 
     def validate_schema(self, df: pd.DataFrame) -> dict:
         required = set(self.cfg.required_columns)
         present = set(df.columns)
         missing = list(required - present)
         return {
-            "status": bool(len(missing) == 0), # Explicit bool for JSON serializing
+            "status": bool(len(missing) == 0),  # Explicit bool for JSON serializing
             "missing_columns": missing,
         }
 
@@ -24,12 +26,12 @@ class DataValidation:
         # FIX: If text is an empty string "" but not NULL, isnull() misses it.
         # We check for both NaN and empty whitespace.
         missing_count = df.isnull().sum().to_dict()
-        
+
         # Checking for empty strings in 'text' specifically
-        if 'text' in df.columns:
-            empty_strings = int((df['text'].astype(str).str.strip() == "").sum())
-            missing_count['text_empty_string'] = empty_strings
-        
+        if "text" in df.columns:
+            empty_strings = int((df["text"].astype(str).str.strip() == "").sum())
+            missing_count["text_empty_string"] = empty_strings
+
         status = all(v == 0 for v in missing_count.values())
         return {
             "status": bool(status),
@@ -41,12 +43,12 @@ class DataValidation:
         for column, allowed in self.cfg.allowed_values.items():
             if column not in df.columns:
                 continue
-            
+
             # BUG FIX: isin() can be slow on huge sets. This is fine for [0,1].
             invalid_idx = df[~df[column].isin(allowed)].index.tolist()
             if invalid_idx:
                 # Limit reported indices to 10 so the JSON report doesn't explode in size
-                invalid_rows[column] = invalid_idx[:10] 
+                invalid_rows[column] = invalid_idx[:10]
         return {
             "status": bool(len(invalid_rows) == 0),
             "invalid_rows": invalid_rows,
@@ -66,18 +68,20 @@ class DataValidation:
             "mismatched_dtypes": mismatches,
         }
 
-    def validate_data_drift_and_leakage(self, df_train: pd.DataFrame, df_test: pd.DataFrame) -> dict:
+    def validate_data_drift_and_leakage(
+        self, df_train: pd.DataFrame, df_test: pd.DataFrame
+    ) -> dict:
         # BUG FIX: Ensure we drop NaNs before set intersection to avoid errors
-        train_texts = set(df_train['text'].dropna().astype(str).str.strip().tolist())
-        test_texts = set(df_test['text'].dropna().astype(str).str.strip().tolist())
-        
+        train_texts = set(df_train["text"].dropna().astype(str).str.strip().tolist())
+        test_texts = set(df_test["text"].dropna().astype(str).str.strip().tolist())
+
         overlap = train_texts.intersection(test_texts)
         status = len(overlap) == 0
 
         return {
             "status": bool(status),
             "overlap_count": int(len(overlap)),
-            "overlap_examples": list(overlap)[:3] if not status else []
+            "overlap_examples": list(overlap)[:3] if not status else [],
         }
 
     def _get_df_report(self, df: pd.DataFrame) -> dict:
@@ -85,7 +89,7 @@ class DataValidation:
             "schema_check": self.validate_schema(df),
             "missing_values_check": self.validate_missing_values(df),
             "allowed_values_check": self.validate_allowed_values(df),
-            "dtype_check": self.validate_dtype(df)
+            "dtype_check": self.validate_dtype(df),
         }
 
     def initiate_data_validation(self) -> DataValidationArtifact:
@@ -97,7 +101,9 @@ class DataValidation:
 
             self.report["train_set"] = self._get_df_report(df_train)
             self.report["test_set"] = self._get_df_report(df_test)
-            self.report["contamination_check"] = self.validate_data_drift_and_leakage(df_train, df_test)
+            self.report["contamination_check"] = self.validate_data_drift_and_leakage(
+                df_train, df_test
+            )
 
             with open(self.cfg.data_validation_report_path, "w") as f:
                 json.dump(self.report, f, indent=4)
@@ -108,7 +114,7 @@ class DataValidation:
                 for check in self.report[section].values():
                     if not check["status"]:
                         overall_status = False
-            
+
             if not self.report["contamination_check"]["status"]:
                 overall_status = False
 

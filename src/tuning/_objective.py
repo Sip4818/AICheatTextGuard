@@ -1,4 +1,3 @@
-from random import seed
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.linear_model import LogisticRegression
 from xgboost import XGBClassifier

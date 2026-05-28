@@ -1,11 +1,10 @@
-from operator import index
 import os
-from pickle import NONE
 import yaml
 import joblib
 import pandas as pd
 from box import ConfigBox
 from google.cloud import storage
+from pathlib import Path
 import numpy as np
 
 from src.utils.logger import logger
@@ -53,9 +52,6 @@ def read_yaml(path: str) -> ConfigBox:
         logger.error(f"Could not read YAML file: {path}")
         raise AITextException(e)
 
-
-import yaml
-from pathlib import Path
 
 
 def write_yaml(data: dict, file_path: str) -> None:
@@ -117,14 +113,13 @@ def upload_to_gcs(
 
         blob.upload_from_filename(source_path, timeout=timeout)
 
-        logger.info(
-            f"Upload completed: gs://{bucket_name}/{destination_path}"
-        )
+        logger.info(f"Upload completed: gs://{bucket_name}/{destination_path}")
 
     except Exception as e:
         logger.error("Failed to upload file to GCS")
         raise AITextException(e)
-    
+
+
 def download_from_gcs(bucket_name: str, source_path: str, local_path: str) -> None:
     """Downloads a blob from GCS to local."""
     try:
@@ -170,12 +165,13 @@ def read_csv_file(file_path: str) -> pd.DataFrame:
         logger.error(f"Failed to read CSV: {file_path}")
         raise AITextException(e)
 
+
 def save_csv(df: pd.DataFrame, path: str) -> None:
     try:
         dir_path = os.path.dirname(path)
         if dir_path:
             os.makedirs(dir_path, exist_ok=True)
-        df.to_csv(path, index= False)
+        df.to_csv(path, index=False)
 
         logger.info(f"CSV file saved at {path}")
     except Exception as e:

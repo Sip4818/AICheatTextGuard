@@ -13,7 +13,6 @@ from sklearn.model_selection import train_test_split
 from src.constants.constants import SEED
 
 
-
 class DataIngestion:
     def __init__(self, cfg: DataIngestionConfig) -> None:
         self.cfg = cfg
@@ -50,7 +49,10 @@ class DataIngestion:
             data = read_csv_file(self.cfg.local_data_path)
             data = data[self.cfg.required_columns].copy()
             train, test = train_test_split(
-                data, test_size=self.cfg.test_split_size, random_state=SEED, stratify= data[self.cfg.target_column_name]
+                data,
+                test_size=self.cfg.test_split_size,
+                random_state=SEED,
+                stratify=data[self.cfg.target_column_name],
             )
 
             save_csv(train, self.cfg.local_train_path)

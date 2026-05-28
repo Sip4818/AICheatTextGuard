@@ -3,18 +3,23 @@ from config.configuration import ConfigurationManager
 from config.training_pipeline_config import TrainingPipelineConfig
 
 
-#Config Manager test cases
+# Config Manager test cases
 def test_config_init():
 
     training_pipeline_config = TrainingPipelineConfig()
-    config_manager = ConfigurationManager(training_pipeline_config=training_pipeline_config)
+    config_manager = ConfigurationManager(
+        training_pipeline_config=training_pipeline_config
+    )
 
     assert config_manager is not None
 
-#Test data ingestion config retrieval
+
+# Test data ingestion config retrieval
 def test_get_data_ingestion_config():
     training_pipeline_config = TrainingPipelineConfig()
-    config_manager = ConfigurationManager(training_pipeline_config=training_pipeline_config)
+    config_manager = ConfigurationManager(
+        training_pipeline_config=training_pipeline_config
+    )
 
     data_ingestion_config = config_manager.get_data_ingestion_config()
 
@@ -42,20 +47,24 @@ def test_get_data_ingestion_config():
     assert 0 < data_ingestion_config.test_split_size < 1
     assert len(data_ingestion_config.required_columns) > 0
 
-#Test if data ingestion config paths are created
+
+# Test if data ingestion config paths are created
 def test_data_ingestion_config_paths():
     training_pipeline_config = TrainingPipelineConfig()
-    config_manager = ConfigurationManager(training_pipeline_config=training_pipeline_config)
+    config_manager = ConfigurationManager(
+        training_pipeline_config=training_pipeline_config
+    )
     config = config_manager.get_data_ingestion_config()
 
     assert os.path.exists(os.path.dirname(config.local_train_path))
 
 
-
-#Test data validation config retrieval
+# Test data validation config retrieval
 def test_get_data_validation_config():
     training_pipeline_config = TrainingPipelineConfig()
-    config_manager = ConfigurationManager(training_pipeline_config=training_pipeline_config)
+    config_manager = ConfigurationManager(
+        training_pipeline_config=training_pipeline_config
+    )
 
     data_validation_config = config_manager.get_data_validation_config()
 
@@ -78,19 +87,25 @@ def test_get_data_validation_config():
     assert len(data_validation_config.required_columns) > 0
     assert len(data_validation_config.columns_dtype) > 0
 
-#Check if data validation config paths are created
+
+# Check if data validation config paths are created
 def test_data_validation_config_paths():
     training_pipeline_config = TrainingPipelineConfig()
-    config_manager = ConfigurationManager(training_pipeline_config=training_pipeline_config)
+    config_manager = ConfigurationManager(
+        training_pipeline_config=training_pipeline_config
+    )
     config = config_manager.get_data_validation_config()
 
     assert os.path.exists(os.path.dirname(config.data_validation_report_path))
 
-#Test data transformation config retrieval
+
+# Test data transformation config retrieval
 def test_get_data_transformation_config():
     training_pipeline_config = TrainingPipelineConfig()
-    config_manager = ConfigurationManager(training_pipeline_config=training_pipeline_config)
-        
+    config_manager = ConfigurationManager(
+        training_pipeline_config=training_pipeline_config
+    )
+
     data_transformation_config = config_manager.get_data_transformation_config()
     assert data_transformation_config is not None
     assert hasattr(data_transformation_config, "validated_data_train_path")
@@ -113,21 +128,25 @@ def test_get_data_transformation_config():
     assert len(data_transformation_config.required_columns) > 0
 
 
-
-#Check if data transformation config paths are created
+# Check if data transformation config paths are created
 def test_data_transformation_config_paths():
     training_pipeline_config = TrainingPipelineConfig()
-    config_manager = ConfigurationManager(training_pipeline_config=training_pipeline_config)
+    config_manager = ConfigurationManager(
+        training_pipeline_config=training_pipeline_config
+    )
     config = config_manager.get_data_transformation_config()
 
     assert os.path.exists(os.path.dirname(config.transformed_train_data_path))
     assert os.path.exists(os.path.dirname(config.data_transformation_object_path))
     # assert os.path.exists(os.path.dirname(config.temp_model_dir))
 
-#Test model trainer config retrieval
+
+# Test model trainer config retrieval
 def test_get_model_trainer_config():
     training_pipeline_config = TrainingPipelineConfig()
-    config_manager = ConfigurationManager(training_pipeline_config=training_pipeline_config)
+    config_manager = ConfigurationManager(
+        training_pipeline_config=training_pipeline_config
+    )
 
     model_trainer_config = config_manager.get_model_trainer_config()
 
@@ -156,10 +175,13 @@ def test_get_model_trainer_config():
     assert model_trainer_config.folds > 1
     assert model_trainer_config.folds < 20
 
-#Check if model trainer config paths are created
+
+# Check if model trainer config paths are created
 def test_model_trainer_config_paths():
     training_pipeline_config = TrainingPipelineConfig()
-    config_manager = ConfigurationManager(training_pipeline_config=training_pipeline_config)
+    config_manager = ConfigurationManager(
+        training_pipeline_config=training_pipeline_config
+    )
     config = config_manager.get_model_trainer_config()
 
     assert os.path.exists(os.path.dirname(config.lr_level1_model_path))
@@ -167,13 +189,13 @@ def test_model_trainer_config_paths():
     assert os.path.exists(os.path.dirname(config.final_model_path))
 
 
-
-#Test model trainer tuning config retrieval
+# Test model trainer tuning config retrieval
 def test_get_model_trainer_tuning_config():
     training_pipeline_config = TrainingPipelineConfig()
-    config_manager = ConfigurationManager(training_pipeline_config=training_pipeline_config)
-    
-  
+    config_manager = ConfigurationManager(
+        training_pipeline_config=training_pipeline_config
+    )
+
     tuning_config = config_manager.get_model_trainer_tuning_config()
     assert tuning_config is not None
     assert hasattr(tuning_config, "level1")
@@ -181,20 +203,27 @@ def test_get_model_trainer_tuning_config():
     assert hasattr(tuning_config, "n_trials")
 
 
-#Tests for final model evaluation config retrieval
+# Tests for final model evaluation config retrieval
 def test_get_model_trainer_final_params_config():
     training_pipeline_config = TrainingPipelineConfig()
-    config_manager = ConfigurationManager(training_pipeline_config=training_pipeline_config)
-    
-    final_model_evaluation_config = config_manager.get_model_trainer_final_params_config()
+    config_manager = ConfigurationManager(
+        training_pipeline_config=training_pipeline_config
+    )
+
+    final_model_evaluation_config = (
+        config_manager.get_model_trainer_final_params_config()
+    )
     assert final_model_evaluation_config is not None
     assert hasattr(final_model_evaluation_config, "level1")
     assert hasattr(final_model_evaluation_config, "level2")
 
-#Tests for model evaluation config retrieval
+
+# Tests for model evaluation config retrieval
 def test_get_model_evaluation_config():
     training_pipeline_config = TrainingPipelineConfig()
-    config_manager = ConfigurationManager(training_pipeline_config=training_pipeline_config)
+    config_manager = ConfigurationManager(
+        training_pipeline_config=training_pipeline_config
+    )
     config = config_manager.get_model_evaluation_config()
 
     assert config is not None
@@ -218,11 +247,13 @@ def test_get_model_evaluation_config():
     assert len(config.metrices) > 0
     assert config.push_model_to_gcs in [True, False]
 
-#Check if model evaluation config paths are created
+
+# Check if model evaluation config paths are created
 def test_model_evaluation_config_paths():
     training_pipeline_config = TrainingPipelineConfig()
-    config_manager = ConfigurationManager(training_pipeline_config=training_pipeline_config)
+    config_manager = ConfigurationManager(
+        training_pipeline_config=training_pipeline_config
+    )
     config = config_manager.get_model_evaluation_config()
-
 
     assert os.path.exists(os.path.dirname(config.model_evaluation_artifact_file_path))

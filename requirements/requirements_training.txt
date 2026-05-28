@@ -22,3 +22,5 @@ streamlit==1.52.2
 mlflow
 optuna-integration
 pytest==9.0.1
+ruff==0.0.241
+mypy==1.0.0

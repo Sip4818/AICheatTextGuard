@@ -11,7 +11,7 @@ def create_folder(path):
 
 def create_file(path):
     if not os.path.exists(path):
-        with open(path, "w") as f:
+        with open(path, "w"):
             pass
         print(f"[+] Created file: {path}")
     else:
