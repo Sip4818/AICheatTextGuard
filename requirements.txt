@@ -22,5 +22,5 @@ asyncio==4.0.0
 prometheus_fastapi_instrumentator==7.1.0
 # docker==7.1.0 
 pytest==9.0.1
-ruff==0.0.241
-mypy==1.0.0
+ruff==0.15.14
+mypy==1.20.0
