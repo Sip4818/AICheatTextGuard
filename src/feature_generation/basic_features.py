@@ -46,7 +46,6 @@ class BasicFeatureGenerator(BaseEstimator, TransformerMixin):
         words = text.lower().split()
         return sum(1 for word in words if word in self.stop_words)
 
-
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
         df = data.copy()
 

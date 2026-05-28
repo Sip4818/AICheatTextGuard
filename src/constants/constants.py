@@ -1,4 +1,5 @@
 from typing import Any
+
 # Pipeline config
 data_root: str = "data"
 artifacts_root: str = "artifact"
@@ -32,7 +33,7 @@ XGB_KEYS = [
     "reg_lambda",
 ]
 
-params_dict_format: dict[str,Any] = {
+params_dict_format: dict[str, Any] = {
     "model_trainer": {
         "level1": {
             "lr": {

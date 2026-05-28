@@ -53,7 +53,6 @@ def read_yaml(path: str) -> ConfigBox:
         raise AITextException(e)
 
 
-
 def write_yaml(data: dict, file_path: str) -> None:
     path = Path(file_path)
     path.parent.mkdir(parents=True, exist_ok=True)
