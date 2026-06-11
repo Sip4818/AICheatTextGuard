@@ -2,7 +2,9 @@ from fastapi.testclient import TestClient
 from unittest.mock import patch
 import numpy as np
 
-from app import app
+# Patch PredictionPipeline.__init__ to prevent it from loading the model file during import
+with patch('src.pipeline.prediction.prediction_pipeline.PredictionPipeline.__init__', return_value=None):
+    from app import app
 
 client = TestClient(app)
 
