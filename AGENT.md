@@ -117,6 +117,7 @@ Do not manually edit generated artifacts unless the user explicitly asks. Prefer
 - Add focused tests for changed behavior, especially validation, feature generation, prediction request handling, and pipeline config parsing.
 - Use structured YAML/JSON readers for config files; avoid ad hoc string edits.
 - Do not remove user-generated artifacts or untracked files without explicit approval.
+- Before pushing any changes, you MUST locally run all linting tools specified in CI (`ruff format --check .`, `ruff check .`, and `mypy .`) as well as the test suite (`pytest tests/ -v`).
 
 <!-- Test comment for permission validation -->
 
