@@ -56,7 +56,8 @@ Run tests:
 pytest
 ```
 
-Current test coverage is minimal; `tests/test_basic.py` is empty.
+**Current status of project**: The current test coverage is minimal. Most test files (like `tests/test_basic.py`, `tests/test_api.py`, etc.) are empty placeholder files. We need to implement all the test cases to ensure reliability and correctness of the pipeline and application components.
+
 
 ## Key Files And Directories
 
@@ -101,8 +102,10 @@ Do not manually edit generated artifacts unless the user explicitly asks. Prefer
 - `src/constants/constants.py` appears to swap `test_file_name` and `train_file_name`; verify behavior before relying on those constants.
 - `ui/streamlit_app.py` does not provide a fallback for missing `BACKEND_URL` and does not handle request exceptions.
 - `app.py` hardcodes Redis host as `redis` instead of using the `REDIS_HOST` environment variable declared in Compose.
+- `app.py` has an invalid `await r.get(key)` call on the standard synchronous `redis.Redis` client, which throws a `TypeError` at runtime.
+- `app.py` performs a synchronous `r.set` call inside an async endpoint, which blocks the main event loop.
 - Several files contain mojibake characters from encoding issues, especially `README.md`, `ui/streamlit_app.py`, and some log strings.
-- `requirements.txt` includes `dotenv==0.9.9`; most Python projects intend `python-dotenv`.
+- [RESOLVED] `requirements.txt` included `dotenv==0.9.9` (updated to `python-dotenv==1.0.1`).
 - Avoid broad refactors in pipeline code without adding tests, because artifacts, DVC dependencies, and serialized model compatibility are tightly coupled.
 
 ## Coding Guidelines
@@ -114,3 +117,6 @@ Do not manually edit generated artifacts unless the user explicitly asks. Prefer
 - Add focused tests for changed behavior, especially validation, feature generation, prediction request handling, and pipeline config parsing.
 - Use structured YAML/JSON readers for config files; avoid ad hoc string edits.
 - Do not remove user-generated artifacts or untracked files without explicit approval.
+
+<!-- Test comment for permission validation -->
+
