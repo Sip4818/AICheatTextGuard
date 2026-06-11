@@ -4,7 +4,7 @@ ipykernel==7.1.0
 pyyaml==6.0.3
 python-box==7.3.2
 google-cloud-storage==3.6.0
-dotenv==0.9.9
+python-dotenv==1.0.1
 dvc-gs==3.0.2
 pandas==2.3.3
 google-crc32c==1.5.0
