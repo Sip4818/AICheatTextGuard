@@ -56,7 +56,7 @@ Run tests:
 pytest
 ```
 
-**Current status of project**: The current test coverage is minimal. Most test files (like `tests/test_basic.py`, `tests/test_api.py`, etc.) are empty placeholder files. We need to implement all the test cases to ensure reliability and correctness of the pipeline and application components.
+**Current status of project**: The current test coverage is minimal. Most test files (like `tests/test_basic.py`, `tests/test_security.py`, etc.) are empty placeholder files. We need to implement all the test cases to ensure reliability and correctness of the pipeline and application components.
 
 
 ## Key Files And Directories
@@ -120,3 +120,6 @@ Do not manually edit generated artifacts unless the user explicitly asks. Prefer
 
 <!-- Test comment for permission validation -->
 
+## Agent Changelog
+- Removed unused commented-out assertion from `tests/test_config.py`.
+- Implemented core test cases for the FastAPI backend in `tests/test_api.py` (including valid request and length constraints).

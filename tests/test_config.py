@@ -138,7 +138,6 @@ def test_data_transformation_config_paths():
 
     assert os.path.exists(os.path.dirname(config.transformed_train_data_path))
     assert os.path.exists(os.path.dirname(config.data_transformation_object_path))
-    # assert os.path.exists(os.path.dirname(config.temp_model_dir))
 
 
 # Test model trainer config retrieval
