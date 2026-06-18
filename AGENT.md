@@ -110,6 +110,7 @@ Do not manually edit generated artifacts unless the user explicitly asks. Prefer
 
 ## Coding Guidelines
 
+- **Always ask for explicit permission before pushing any changes to the remote repository.** Do not push without the user saying so.
 - Before editing, creating, deleting, formatting, staging, committing, or pushing any file, ask the user for explicit permission. Do not change even a single line without approval.
 - Keep edits scoped to the requested behavior.
 - Preserve existing serialized model contracts unless retraining/regeneration is part of the task.
@@ -117,10 +118,56 @@ Do not manually edit generated artifacts unless the user explicitly asks. Prefer
 - Add focused tests for changed behavior, especially validation, feature generation, prediction request handling, and pipeline config parsing.
 - Use structured YAML/JSON readers for config files; avoid ad hoc string edits.
 - Do not remove user-generated artifacts or untracked files without explicit approval.
-- Before pushing any changes, you MUST locally run all linting tools specified in CI (`ruff format --check .`, `ruff check .`, and `mypy .`) as well as the test suite (`pytest tests/ -v`).
+- Before pushing any changes, you MUST run `bash check.sh` (which runs ruff format, ruff lint, mypy, and pytest). This is the same set of checks that run in CI.
 
 <!-- Test comment for permission validation -->
 
 ## Agent Changelog
 - Removed unused commented-out assertion from `tests/test_config.py`.
 - Implemented core test cases for the FastAPI backend in `tests/test_api.py` (including valid request and length constraints).
+
+## Plan: Migrate to `uv`
+
+### What is `uv`?
+`uv` is a fast Python package manager (pip/pip-tools alternative) by Astral (the Ruff authors). It resolves and installs dependencies much faster than pip and supports `uv.lock` for reproducible builds.
+
+### Migration Steps
+
+1. **Install `uv`** globally (e.g., `curl -LsSf https://astral.sh/uv/install.sh | sh` or `pip install uv`).
+2. **Replace `requirements.txt`** with a `pyproject.toml` (or keep `requirements.txt` and use `uv pip install`).
+3. **Generate `uv.lock`** via `uv lock` for pinned, reproducible dependencies.
+4. **Update CI/CD**:
+   - In `.github/workflows/cicd.yml`, replace `pip install` with `uv pip install` or use `uv sync`.
+   - Add caching for `uv.lock` and `~/.cache/uv`.
+5. **Update Dockerfiles** (`Docker/`) to use `uv` for faster builds.
+6. **Update local development commands** in `AGENT.md` and any contributing docs.
+7. **Validate** that `dvc repro`, `pytest`, and `ruff`/`mypy` still work after the migration.
+
+### Key Commands
+
+```bash
+# Install uv (one-time)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Sync dependencies
+uv sync
+
+# Run a command in the uv-managed venv
+uv run python main.py
+
+# Add a package
+uv add <package>
+
+# Lock dependencies
+uv lock
+```
+
+### Status
+- [ ] Install `uv` and verify
+- [ ] Create/replace dependency definition (e.g., `pyproject.toml`)
+- [ ] Generate `uv.lock`
+- [ ] Update CI/CD workflow
+- [ ] Update Dockerfiles
+- [ ] Update docs and commands
+- [ ] Full validation (dvc repro, pytest, ruff, mypy)
+
