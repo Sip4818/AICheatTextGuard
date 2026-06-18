@@ -171,3 +171,185 @@ uv lock
 - [ ] Update docs and commands
 - [ ] Full validation (dvc repro, pytest, ruff, mypy)
 
+
+## Plan: Implement Test Cases for the Entire Project
+
+### Strategy
+
+- Each source module gets a corresponding test file in `tests/` following the existing pattern (`test_<module>.py`).
+- Tests use **pytest** with **mocks** for I/O-heavy operations (GCS, Redis, model files, external APIs).
+- Data validation tests use **small in-memory DataFrames** instead of real CSVs.
+- Pipeline component tests mock their dependencies and verify artifact outputs, error handling, and edge cases.
+- No real model files, GCS buckets, or Redis instances are required to run the tests.
+
+### Test Files and Coverage
+
+#### 1. `tests/test_basic.py` — Placeholder → Utils & Exceptions
+- **Source**: `src/utils/common.py`, `src/utils/exception.py`, `src/utils/logger.py`
+- **Test cases**:
+  - `test_assert_file_exists` — file exists / does not exist
+  - `test_is_yaml_content_empty` — empty / non-empty YAML
+  - `test_read_yaml` — valid YAML, missing file, empty file, invalid structure, YAML syntax error
+  - `test_write_yaml` — writes correct content, creates parent dirs
+  - `test_create_dir` — creates dir, handles existing dir
+  - `test_upload_to_gcs` — mocks `storage.Client`, tests upload success / file not found / overwrite skip
+  - `test_download_from_gcs` — mocks `storage.Client`, tests download success / bucket not found / blob not found
+  - `test_read_csv_file` — valid CSV, non-CSV path, missing file
+  - `test_save_csv` — saves correctly, creates parent dirs
+  - `test_read_object` — valid pkl, missing file
+  - `test_save_object` — saves correctly, creates parent dirs
+  - `test_log_file_size` — valid file, missing file
+  - `test_read_numpy` — valid `.npy`, non-`.npy` path
+  - `test_save_numpy` — saves correctly, creates parent dirs
+  - `test_extract_params` — basic extraction, non-primitive values converted to float
+  - `test_to_dict` — nested ConfigBox, plain dict, list, primitive
+  - `test_AITextException` — with traceback / without traceback, `__str__` format
+  - `test_logger` — logger is configured, has file and console handlers (smoke test)
+
+#### 2. `tests/test_config.py` — Config Entities & ConfigurationManager
+- **Source**: `config/configuration.py`, `config/training_pipeline_config.py`, `src/entity/config_entity.py`, `src/entity/model_trainer_tuning_entity.py`, `src/entity/model_trainer_final_params_entity.py`
+- *(Already partially implemented with tests for all config entity retrieval methods)*
+- **Additional cases**:
+  - `test_config_init_missing_yaml` — `ConfigurationManager` raises on missing config YAML
+  - `test_config_init_empty_yaml` — `ConfigurationManager` handles empty params YAML (writes defaults)
+  - `test_get_data_ingestion_config_creates_dirs` — verifies root dir is created
+  - `test_get_model_trainer_tuning_config` — returns correct `ModelTrainerTuningConfig` with nested spaces
+  - `test_get_model_trainer_final_params_config` — returns correct `ModelTrainerFinalParamsConfig`
+  - `test_training_pipeline_config` — `TrainingPipelineConfig` has correct defaults
+  - Config entity dataclass tests: each entity creates correctly with valid/invalid inputs
+
+#### 3. `tests/test_feature_engineering.py` — Feature Generation
+- **Source**: `src/feature_generation/basic_features.py`, `src/feature_generation/transformer_embedding.py`
+- **Test cases for `BasicFeatureGenerator`**:
+  - `test_get_cleaned_string` — lowercasing, special char removal, whitespace normalization, non-string input returns `""`
+  - `test_get_punctuation_count` — various punctuation patterns
+  - `test_get_avg_word_length` — normal text, empty string returns `0.0`, single word
+  - `test_get_capital_words_count` — uppercase words, mixed case, no uppercase
+  - `test_get_stopword_count` — multiple stopwords, no stopwords
+  - `test_transform` — full transform on a sample DataFrame with `text` column, verifies all feature columns exist
+  - `test_transform_missing_text_column` — raises `KeyError`
+  - `test_fit_returns_self` — `fit()` returns `self`
+- **Test cases for `EmbeddingFeaturesGenerator`**:
+  - `test_init` — stores model_path and model_name defaults
+  - `test_fit` — mocks `SentenceTransformer` to verify model is loaded with correct args
+  - `test_transform` — mocks model.encode, uses DataFrame with `cleaned_text` and numeric columns, verifies output shape
+  - `test_transform_missing_cleaned_text` — raises `KeyError`
+
+#### 4. `tests/test_preprocessing.py` — Data Transformation
+- **Source**: `src/components/data_transformation.py`
+- **Test cases**:
+  - `test_split_data` — splits X and y correctly from a sample DataFrame
+  - `test_split_data_missing_target` — raises error when target column missing
+  - `test_initiate_data_transformation` — mocks `read_csv_file`, `BasicFeatureGenerator`, `EmbeddingFeaturesGenerator`, verifies pipeline fit_transform is called, numpy array and pipeline object are saved
+  - `test_initiate_data_transformation_file_not_found` — handles missing CSV gracefully
+  - `test_identity_func` — returns input unchanged
+
+#### 5. `tests/test_validation.py` — Data Validation
+- **Source**: `src/components/data_validation.py`
+- **Test cases**:
+  - `test_validate_schema` — all required columns present / missing columns
+  - `test_validate_missing_values` — no missing values, has NaN, empty strings in `text` column
+  - `test_validate_allowed_values` — valid values, invalid values, truncation to 10 reported indices
+  - `test_validate_dtype` — matching dtypes, mismatched dtypes
+  - `test_validate_data_drift_and_leakage` — no overlap, some overlap, overlap with NaN handling
+  - `test_initiate_data_validation` — mocks `read_csv_file`, verifies report JSON is written with all sections, returns `DataValidationArtifact`
+  - `test_initiate_data_validation_raises` — handles exceptions during validation
+
+#### 6. `tests/test_pipeline.py` — Pipeline Components
+- **Source**: `src/components/data_ingestion.py`, `src/components/model_trainer.py`, `src/components/model_evaluation.py`, `src/pipeline/training/training_pipeline.py`, `src/pipeline/prediction/prediction_pipeline.py`
+- **`DataIngestion`**:
+  - `test_download_data` — mocks `download_from_gcs`, verifies call with correct args
+  - `test_download_data_raises` — mocks failure in `download_from_gcs`
+  - `test_initiate_data_ingestion` — mocks download, file assertions, CSV read, train/test split, CSV saves, returns `DataIngestionArtifact`
+  - `test_initiate_data_ingestion_no_download` — when `to_download_data=False`
+  - `test_initiate_data_ingestion_missing_data` — raises when data file missing after download
+- **`ModelTrainer`**:
+  - `test_init` — mocks `read_object` for preprocessor, verifies `object_storage`
+  - `test_generate_oof_xgb_preds` — mocks StratifiedKFold, XGBClassifier fit/predict, numpy saves
+  - `test_generate_oof_lr_preds` — mocks StratifiedKFold, Pipeline fit/predict, numpy saves
+  - `test_log_metrics` — verifies AUC, precision, recall, F1 calculation
+  - `test_train` — mocks and verifies all model saves and object_storage updates
+  - `test_initiate_model_training` — full flow with tuning enabled / disabled, verifies final stacked model save
+  - `test_initiate_model_training_tuning_enabled` — mocks Tuner, verifies params YAML write
+- **`ModelEvaluation`**:
+  - `test_split_data` — splits X/y correctly
+  - `test_write_report` — writes JSON correctly
+  - `test_push_model_to_gcs` — mocks `upload_to_gcs`
+  - `test_initiate_model_evaluation` — mocks model read, test data read, computes metrics, saves JSON and plot
+  - `test_initiate_model_evaluation_push_model` — verifies GCS push when config flag is True
+- **`TrainingPipeline`**:
+  - `test_full_pipeline_orchestration` — mocks all 4 stage methods, verifies they are called in order
+  - `test_pipeline_initialization` — `TrainingPipeline.__init__` creates `ConfigurationManager`
+- **`PredictionPipeline`**:
+  - `test_init` — mocks `read_object`, loads model
+  - `test_predict` — mocks model's `predict_proba`, returns expected array
+
+#### 7. `tests/test_model.py` — Model & Tuning
+- **Source**: `src/tuning/tuner.py`, `src/tuning/_objective.py`, `src/tuning/_search_spaces.py`, `src/tuning/_utils.py`
+- **`SearchSpaces`**:
+  - `test_build_space_float` — suggests float with/without log
+  - `test_build_space_int` — suggests int
+  - `test_build_space_categorical` — suggests categorical
+  - `test_build_space_unsupported_type` — raises `ValueError`
+- **`Objective`**:
+  - `test_call` — mocks `_build_model` and `_evaluate`, returns AUC score
+  - `test_build_model_lr` — creates `LogisticRegression` with params
+  - `test_build_model_xgb` — creates `XGBClassifier` with params
+  - `test_build_model_unknown` — raises `ValueError`
+  - `test_evaluate` — mocks `cross_val_score`, returns mean AUC
+- **`Tuner`**:
+  - `test_tune_xgb_level1` — mocks `Objective`, `optuna.create_study`, mlflow, verifies best params returned
+  - `test_tune_lr_level1` — same for LR level 1
+  - `test_tune_lr_level2` — same for LR level 2, verifies ValueError when X_meta is None
+  - `test_setup_mlflow` — mocks mlflow experiment creation
+- **`_utils`**:
+  - `test_set_seed` — seeds random and numpy
+  - `test_save_study_best_params` — writes JSON correctly
+  - `test_save_study` — saves trials DataFrame as CSV
+  - `test_print_study_results` — smoke test (print capture)
+  - `test_namespace_params` — prefixes keys correctly
+
+#### 8. `tests/test_api.py` — FastAPI Backend
+- **Source**: `app.py`
+- *(Already has 3 tests: valid request, too short, too long)*
+- **Additional cases**:
+  - `test_predict_redis_cache_hit` — mocks Redis `get`, verifies cached response returned
+  - `test_predict_redis_not_available` — mocks `r = None` scenario
+  - `test_predict_redis_get_error` — mocks RedisError on get, falls through to prediction
+  - `test_predict_redis_set_error` — mocks RedisError on set, still returns prediction
+  - `test_cache_key` — `PredictRequest.cache_key()` returns deterministic SHA-256 hash
+  - `test_predict_invalid_payload` — missing `text` key, non-string text
+  - `test_predict_predictor_raises` — mocks `predictor.predict` to raise, verifies 500
+
+#### 9. `tests/test_security.py` — Security & Input Validation
+- **Source**: `app.py` (Pydantic model), `ui/streamlit_app.py`
+- **Test cases**:
+  - `test_predict_request_min_length` — Pydantic model validates `text` >= 250 chars
+  - `test_predict_request_max_length` — Pydantic model validates `text` <= 5000 chars
+  - `test_predict_request_exact_boundaries` — exactly 250 chars, exactly 5000 chars
+  - `test_streamlit_backend_url_required` — verifies `ValueError` when `BACKEND_URL` not set
+
+### Running the Tests
+
+```bash
+# Run all tests
+pytest tests/ -v
+
+# Run specific test file
+pytest tests/test_validation.py -v
+
+# Run with coverage
+pytest tests/ -v --cov=src --cov=app --cov-report=term-missing
+```
+
+### Implementation Order (Recommended)
+
+1. **`tests/test_basic.py`** — Utils & exceptions (foundational, no complex dependencies)
+2. **`tests/test_config.py`** — Config entities (already partially done, add remaining cases)
+3. **`tests/test_validation.py`** — Data validation (pure logic, DataFrame-based)
+4. **`tests/test_feature_engineering.py`** — Feature generation (standalone transformers)
+5. **`tests/test_preprocessing.py`** — Data transformation (builds on feature gen)
+6. **`tests/test_model.py`** — Model & tuning (model logic, search spaces)
+7. **`tests/test_pipeline.py`** — Pipeline components (heavily mocked)
+8. **`tests/test_api.py`** — API (builds on prediction pipeline mocks)
+9. **`tests/test_security.py`** — Security & input validation
