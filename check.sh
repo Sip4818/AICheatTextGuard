@@ -4,17 +4,25 @@ set -euo pipefail
 echo "=== Running pre-push checks ==="
 
 echo ""
-echo "--- ruff format (check) ---"
-ruff format --check .
+echo "--- ruff format (auto-fix) ---"
+uv tool run ruff format .
 
 echo ""
-echo "--- ruff lint ---"
-ruff check .
+echo "--- ruff lint (auto-fix) ---"
+uv tool run ruff check --fix .
+
+echo ""
+echo "--- ruff format (verify) ---"
+uv tool run ruff format --check .
+
+echo ""
+echo "--- ruff lint (verify) ---"
+uv tool run ruff check .
 
 echo ""
 echo "--- mypy type check ---"
 if find . -path ./.venv -prune -o -name "*.py" -print -quit | grep -q .; then
-  mypy .
+  uv tool run mypy .
 else
   echo "No Python files found; skipping mypy."
 fi
@@ -22,7 +30,7 @@ fi
 echo ""
 echo "--- pytest ---"
 if [ -d tests ]; then
-  pytest tests/ -v
+  uv tool run pytest tests/ -v
 else
   echo "No tests directory found; skipping pytest."
 fi
