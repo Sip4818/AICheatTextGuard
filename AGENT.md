@@ -353,3 +353,86 @@ pytest tests/ -v --cov=src --cov=app --cov-report=term-missing
 7. **`tests/test_pipeline.py`** — Pipeline components (heavily mocked)
 8. **`tests/test_api.py`** — API (builds on prediction pipeline mocks)
 9. **`tests/test_security.py`** — Security & input validation
+
+## Inconsistencies, Spelling Mistakes & Issues Found
+
+### Spelling / Typos
+
+| # | File | Issue | Should Be |
+|---|------|-------|-----------|
+| 1 | `dvc.yaml` (line 54) | Stage cmd `model_evalute` | `model_evaluate` |
+| 2 | `src/pipeline/training/model_evalute.py` | Filename misspelled `model_evalute` | `model_evaluate` |
+| 3 | `config/config.yaml` (line 69) | `metrices` (field name) | `metrics` |
+| 4 | `config/config.yaml` (line 69) | `auc_ruc` (value in metrices list) | `auc_roc` |
+| 5 | `src/entity/config_entity.py` (line 60) | `metrices` (dataclass field) | `metrics` |
+| 6 | `config/configuration.py` (line 212) | `metrices=` (parameter passing) | `metrics=` |
+| 7 | `src/constants/constants.py` (line 67) | `validation_report_tempelate` | `validation_report_template` |
+| 8 | `src/utils/common.py` (line 207) | Docstring `\"\"\"Loggin file size\"\"\"` | `\"\"\"Logging file size\"\"\"` |
+| 9 | `config/configuration.py` (line 203) | log message `\"Model evalutaion root artifact\"` | `\"Model evaluation root artifact\"` |
+| 10 | `src/tuning/tuner.py` (line 14) | Experiment name `My_Staking_Model_Project` | `My_Stacking_Model_Project` |
+| 11 | `src/tuning/tuner.py` (line 55) | MLflow run name `XGB_Level1_Tuning` (inconsistent casing with `Lr_Level1_Tuning`) | `XGB_Level1_Tuning` (acceptable but inconsistent with `Lr_` prefix) |
+| 12 | `src/tuning/tuner.py` (line 82, 110) | MLflow run names `Lr_Level1_Tuning` and `lr_Level2_Tuning` (inconsistent case) | Use consistent casing e.g. `LR_Level1_Tuning`, `LR_Level2_Tuning` |
+
+### Naming / Consistency Issues
+
+| # | File | Issue |
+|---|------|-------|
+| 13 | `src/constants/constants.py` (lines 16-17) | `test_file_name = \"train.csv\"` and `train_file_name = \"test.csv\"` — values appear swapped |
+| 14 | `config/config.yaml` (line 16) | Validation report path uses `.txt` extension (`data_validation_report.txt`) but code writes JSON content |
+| 15 | `config/config.yaml` (line 16) | Config key `validated_data_report_file_path` vs entity field name `data_validation_report_path` — inconsistent naming |
+| 16 | `config/config.yaml` (line 71) | Config key `model_evaluation_file_path` vs entity field `model_evaluation_artifact_file_path` — inconsistent naming |
+| 17 | `config/config.yaml` (line 72) | Plot file named `confusion_metrics.png` but it is a confusion matrix plot — should be `confusion_matrix.png` |
+| 18 | `ui/streamlit_app.py` (line 5) | Variable named `API_URL` but reads env var `BACKEND_URL` — inconsistent naming |
+| 19 | `ui/streamlit_app.py` (line 9) | Error message says `API_URL` but env var is `BACKEND_URL` |
+
+### Critical Bugs
+
+| # | File | Issue |
+|---|------|-------|
+| 20 | `src/model/stack_model.py` | **File does not exist!** However `src/components/model_trainer.py` (line 30) imports `from src.model.stack_model import StackedModel`. The `src/model/` directory itself is missing. This will cause an `ImportError` at runtime when training runs. |
+| 21 | `app.py` (line 21) | Redis host is hardcoded as `\"redis\"` instead of reading the `REDIS_HOST` env var declared in `compose.yml` |
+| 22 | `app.py` (line 49) | `await r.get(key)` used on synchronous `redis.Redis` client — `TypeError` at runtime |
+| 23 | `app.py` (line 66) | Synchronous `r.set()` call inside `async def predict` endpoint — blocks event loop |
+
+### Dead / Unused Code
+
+| # | File | Issue |
+|---|------|-------|
+| 24 | `src/tuning/_utils.py` | Contains 5 functions (`set_seed`, `save_study_best_params`, `save_study`, `print_study_results`, `namespace_params`) that are never imported or used anywhere in the project |
+| 25 | `tests/test_basic.py` | Empty placeholder file |
+| 26 | `tests/test_feature_engineering.py` | Empty placeholder file |
+| 27 | `tests/test_model.py` | Empty placeholder file |
+| 28 | `tests/test_pipeline.py` | Empty placeholder file |
+| 29 | `tests/test_preprocessing.py` | Empty placeholder file |
+| 30 | `tests/test_security.py` | Empty placeholder file |
+| 31 | `tests/test_validation.py` | Empty placeholder file |
+
+### Config / Structure Issues
+
+| # | File | Issue |
+|---|------|-------|
+| 32 | `config/config.yaml` | Inconsistent indentation — some sections use different spacing patterns |
+| 33 | `data_schema/schema.yaml` | Has `\r\n` (CRLF) line endings while other YAML files use `\n` (LF) — mixed line endings |
+| 34 | `structure.txt` | Outdated project structure file — lists files that no longer exist |
+| 35 | `AGENT.md` (line 72) | References `src/model/stack_model.py` as a key file but it does not exist |
+
+### Test Code Issues
+
+| # | File | Issue |
+|---|------|-------|
+| 36 | `tests/test_config.py` (line 234) | Uses `metrices` attribute (matches the misspelled entity field, so functionally consistent, but propagates the typo) |
+
+### Minor Issues
+
+| # | File | Issue |
+|---|------|-------|
+| 37 | `src/utils/exception.py` (line 30) | Commented-out `if __name__==\"__main__\":` block — dead debug code |
+| 38 | `src/components/data_transformation.py` (line 42) | Commented-out line `# df_train = df_train.sample(50)` — leftover debug code |
+| 39 | `app.py` (line 23) | `load_dotenv()` is missing from `app.py` — should be called so `.env` variables like `REDIS_HOST` would be loaded |
+| 40 | `src/tuning/tuner.py` | `mlflow` is a dependency but not listed in `requirements.txt` (if used at runtime outside tuning) — verify it is installed |
+
+### Notes
+
+- Some misspellings (like `metrices` and `model_evalute`) are referenced across multiple files. Fixing them requires changing **all references** simultaneously, including `dvc.yaml`, config, entities, and test assertions.
+- The `src/model/stack_model.py` missing file (issue #20) is the most critical — the training pipeline cannot run without it.
+- Many of the `app.py` Redis issues (hardcoded host, async/sync mismatch) are already documented in the Known Sharp Edges section above.
