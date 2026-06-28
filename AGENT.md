@@ -119,12 +119,15 @@ Do not manually edit generated artifacts unless the user explicitly asks. Prefer
 - Use structured YAML/JSON readers for config files; avoid ad hoc string edits.
 - Do not remove user-generated artifacts or untracked files without explicit approval.
 - Before pushing any changes, you MUST run `bash check.sh` (which runs ruff format, ruff lint, mypy, and pytest). This is the same set of checks that run in CI.
+- If a commit is authored or assisted by AI, include `[AI assistance]` in the commit message (e.g., `feat: implement Redis caching tests [AI assistance]`).
 
 <!-- Test comment for permission validation -->
 
 ## Agent Changelog
 - Removed unused commented-out assertion from `tests/test_config.py`.
 - Implemented core test cases for the FastAPI backend in `tests/test_api.py` (including valid request and length constraints).
+- Added detailed phased plan for backend tests under `## Plan: Backend Tests (Phased)`.
+- Added commit message convention: include `[AI assistance]` for AI-assisted commits.
 
 ## Plan: Migrate to `uv`
 
@@ -353,6 +356,202 @@ pytest tests/ -v --cov=src --cov=app --cov-report=term-missing
 7. **`tests/test_pipeline.py`** — Pipeline components (heavily mocked)
 8. **`tests/test_api.py`** — API (builds on prediction pipeline mocks)
 9. **`tests/test_security.py`** — Security & input validation
+## Plan: Backend Tests (Phased)
+
+### Scope
+
+This plan covers the **backend** of AITextGuard \— the FastAPI application, prediction pipeline, Pydantic input validation, utility functions used at inference time, and the Streamlit UI client.
+
+| Component | File(s) | Purpose |
+|---|---|---|
+| FastAPI App | `app.py` | `/predict` endpoint, Redis caching, Prometheus metrics |
+| Prediction Pipeline | `src/pipeline/prediction/prediction_pipeline.py` | Loads model, runs `predict_proba` |
+| Pydantic Validation | `app.py` (`PredictRequest`) | Text length constraints, `cache_key()` |
+| Backend Utilities | `src/utils/common.py` (subset) | `read_object`, `assert_file_exists`, `log_file_size` |
+| Streamlit UI | `ui/streamlit_app.py` | Client that calls the backend API |
+
+---
+
+### Phase 1: Foundation \— Shared Test Infrastructure
+
+**Goal**: Create reusable pytest fixtures, mocks, and helpers so all later phases are DRY and consistent.
+
+**File**: `tests/conftest.py` (create)
+
+**Fixtures**:
+
+| Fixture | Purpose |
+|---|---|
+| `valid_text` | String ≥ 250 chars that passes Pydantic validation |
+| `mock_predictor` | Patches `PredictionPipeline.predict` to return controlled probabilities |
+| `mock_redis_available` | Patches `app.r` to a mock Redis client |
+| `mock_redis_unavailable` | Patches `app.r = None` |
+| `client` | `TestClient(app)' with model-loading suppressed at import |
+| `sample_df` | Small in-memory DataFrame for prediction pipeline tests |
+| `mock_model_object` | A mock with `predict_proba` returning known values |
+
+---
+
+### Phase 2: Prediction Pipeline Tests
+
+**Goal**: Test the `PredictionPipeline` class that sits behind the API endpoint.
+
+**File**: `tests/test_pipeline.py` (implement \— currently empty placeholder)
+
+| Test | What it verifies |
+|---|---|
+| `test_prediction_pipeline_init` | `__init__` calls `read_object` with correct path |
+| `test_prediction_pipeline_init_file_not_found` | Raises when model file is missing |
+| `test_prediction_pipeline_predict` | `predict()` calls `model.predict_proba()` and returns expected array |
+| `test_prediction_pipeline_predict_empty_df` | Handles empty DataFrame gracefully |
+| `test_prediction_pipeline_predict_model_raises` | Propagates exception when model predict fails |
+
+**Mocks needed**: `src.utils.common.read_object`
+
+---
+
+### Phase 3: Core API Tests
+
+**Goal**: Extend the existing 3 tests in `tests/test_api.py` to full coverage of the `/predict` endpoint.
+
+**Existing tests** (already present):
+- `test_predict_valid_request`
+- `test_predict_text_too_short`
+- `test_predict_text_too_long`
+
+**New tests to add**:
+
+| Test | What it verifies |
+|---|---|
+| `test_predict_redis_cache_hit` | Mock Redis `get` returns cached JSON; endpoint returns it without calling predictor |
+| `test_predict_redis_cache_miss` | Redis `get` returns None; predictor is called and result returned |
+| `test_predict_redis_not_available` | `r = None`; skips Redis entirely, predictor is called |
+| `test_predict_redis_get_error` | `redis.exceptions.RedisError` on get caught; falls through to prediction |
+| `test_predict_redis_set_error` | `redis.exceptions.RedisError` on set caught; still returns prediction |
+| `test_predict_invalid_payload_missing_text` | POST with `{}` returns 422 |
+| `test_predict_invalid_payload_non_string` | POST with `{"text": 123}` returns 422 |
+| `test_predict_predictor_raises` | When `predictor.predict` raises, endpoint returns 500 |
+| `test_predict_cache_key_deterministic` | Same input produces same cache key |
+| `test_predict_cache_key_different_inputs` | Different inputs produce different cache keys |
+| `test_predict_response_structure` | Valid response has exactly `{"probability": float}` |
+| `test_predict_probability_range` | Returned probability is between 0.0 and 1.0 |
+
+**Mocks needed**: `app.predictor.predict`, `app.r.get`, `app.r.set`, `app.r.ping`
+
+---
+
+### Phase 4: Security & Input Validation Tests
+
+**Goal**: Test Pydantic request validation and backend-related security concerns.
+
+**File**: `tests/test_security.py` (implement \— currently empty placeholder)
+
+| Test | What it verifies |
+|---|---|
+| `test_predict_request_min_length` | Text < 250 chars raises validation error |
+| `test_predict_request_max_length` | Text > 5000 chars raises validation error |
+| `test_predict_request_exact_min_boundary` | Exactly 250 chars is valid |
+| `test_predict_request_exact_max_boundary` | Exactly 5000 chars is valid |
+| `test_predict_request_empty_string` | Empty string raises validation error |
+| `test_predict_request_whitespace_only` | Whitespace string of valid length behavior |
+| `test_predict_request_cache_key_format` | `cache_key()` returns string starting with "Predict:" and is valid SHA-256 hex |
+| `test_predict_request_cache_key_length` | Full cache key length is predictable |
+| `test_streamlit_backend_url_required` | When `BACKEND_URL` is unset, raises `ValueError` |
+| `test_streamlit_backend_url_set` | When `BACKEND_URL` is set, `API_URL` matches it |
+
+---
+
+### Phase 5: Backend Utility Tests
+
+**Goal**: Test utility functions that the backend depends on.
+
+**File**: `tests/test_basic.py` (implement \— currently empty placeholder)
+
+| Test | What it verifies |
+|---|---|
+| `test_read_object_valid` | Reads valid `.pkl` and returns loaded object |
+| `test_read_object_missing_file` | Raises `AITextException` when file does not exist |
+| `test_read_object_corrupted_file` | Handles corrupted pickle gracefully |
+| `test_read_object_invalid_path` | Non-existent path raises |
+| `test_assert_file_exists_valid` | No exception for existing file |
+| `test_assert_file_exists_missing` | Raises `AITextException` for missing file |
+| `test_log_file_size_valid` | Returns expected size for known file |
+| `test_log_file_size_missing` | Raises for missing file |
+| `test_to_dict_with_configbox` | Converts nested `ConfigBox` to plain dict |
+| `test_to_dict_with_plain_dict` | Passes through plain dict unchanged |
+
+---
+
+### Phase 6: Edge Cases & Integration Smoke Tests
+
+**Goal**: Test non-happy-path scenarios and validate that components wire together correctly.
+
+**File**: `tests/test_api.py` (extend further)
+
+| Test | What it verifies |
+|---|---|
+| `test_predict_large_payload_near_limit` | Text at exactly 5000 chars accepted and processed |
+| `test_predict_special_characters` | Unicode, emoji, newlines handled |
+| `test_predict_redis_cache_expiry` | Verify `ex=600` is passed to `r.set` |
+| `test_predict_redis_cache_key_consistency` | Same text from different requests produces same key |
+| `test_app_startup_redis_fail` | When Redis unreachable, `app.r` is `None`, app still works |
+
+---
+
+### Phase 7: Streamlit UI Tests
+
+**Goal**: Test the UI component's integration with the backend.
+
+**File**: `tests/test_ui.py` (create)
+
+| Test | What it verifies |
+|---|---|
+| `test_streamlit_missing_backend_url_raises` | Raises `ValueError` when env var not set |
+| `test_streamlit_backend_url_from_env` | Reads `BACKEND_URL` correctly |
+| `test_streamlit_page_config` | Page configured with correct title |
+| `test_streamlit_predict_success` | Mocks `requests.post` returning 200 with probability |
+| `test_streamlit_predict_failure` | Mocks `requests.post` returning non-200 |
+
+---
+
+### Mock Strategy
+
+| External Dependency | Mock Strategy |
+|---|---|
+| `model/stacked_model.pkl` | Patch `src.utils.common.read_object` → mock with `predict_proba` |
+| Redis server | Patch `app.r` with `unittest.mock.MagicMock` (get, set, ping) |
+| Google Cloud Storage | Not needed for backend tests |
+| Sentence Transformers | Not needed for backend tests |
+| Prometheus | `Instrumentator` called at module level — patch/suppress during import |
+
+### Files to Create / Modify
+
+| File | Action | Phase |
+|---|---|---|
+| `tests/conftest.py` | **Create** | 1 |
+| `tests/test_pipeline.py` | **Implement** (was empty) | 2 |
+| `tests/test_api.py` | **Extend** (3 → 15+ tests) | 3, 6 |
+| `tests/test_security.py` | **Implement** (was empty) | 4 |
+| `tests/test_basic.py` | **Implement** (was empty) | 5 |
+| `tests/test_ui.py` | **Create** | 7 |
+
+### Recommended Execution Order
+
+```
+Phase 1: conftest.py          ─┐
+                               │
+Phase 2: Prediction Pipeline  ─┤  (no Redis or FastAPI needed)
+                               │
+Phase 5: Backend Utilities    ─┘  (pure logic, easy to mock)
+                               │
+Phase 3: Core API Tests       ─┤  (extends existing test_api.py)
+                               │
+Phase 4: Security Tests       ─┤  (Pydantic + Streamlit)
+                               │
+Phase 6: Edge Cases           ─┤  (depends on Phase 1 + 3)
+                               │
+Phase 7: Streamlit UI Tests   ─┘  (can be done in parallel with 6)
+```
 
 ## Inconsistencies, Spelling Mistakes & Issues Found
 
